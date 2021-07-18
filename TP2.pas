@@ -92,9 +92,11 @@ BEGIN
 END;
 Procedure Alta_empresas;
 BEGIN
+
 END;
 Procedure Alta_proy;
 BEGIN
+
 END;
 Procedure Alta_prod;
 BEGIN
@@ -117,9 +119,6 @@ BEGIN
                 ELSE
            END
      UNTIL(opcion ='0');
-      writeln('hola');
-            writeln(ciudades[1,1]);
-           readln()
 END;
 
 Procedure Menu_clientes;
@@ -142,3 +141,4 @@ BEGIN
            END
      UNTIL (opcion='0');
 END.
+
