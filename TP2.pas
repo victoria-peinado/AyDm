@@ -74,6 +74,21 @@ BEGIN
                       END
              END
 END;
+Function Bus_cod_ciu(cc: string):integer;
+Var q:boolean;
+    comi,fin,medio:integer;
+BEGIN
+     q:=FALSE;
+     comi:=1;
+     fin:=c_ciudades;
+     REPEAT
+           medio:=(comi+fin)DIV 2;
+           IF ciudades[medio,1]=cc THEN q:=TRUE
+                                   ELSE IF ciudades[medio,1]>cc THEN fin:=medio-1
+                                                                ELSE comi:=medio+1;
+     UNTIL (comi>fin) OR q;
+     IF q THEN Bus_cod_ciu:=medio ELSE Bus_cod_ciu:=0
+END;
 Procedure Alta_ciudades;
 Var cod_ciudad:string[3];
     opcion:char;
@@ -84,15 +99,18 @@ BEGIN
      While opcion <>'0' do
      BEGIN
           c_ciudades:=c_ciudades+1;
-          Write('Ingrese el codigo de la ciudad: ');
-          Readln(cod_ciudad);
+          REPEAT
+                Write('Ingrese el codigo de la ciudad: ');
+                Readln(cod_ciudad);
+          UNTIL Bus_cod_ciu(cod_ciudad)=0;
           ciudades[c_ciudades,1]:=cod_ciudad;
           Write('Ingrese el nombre de la ciudad: ');
           Readln(ciudades[c_ciudades,2]);
           ordenar_ciudades();
           ClrScr;
           Writeln('Presione 0 para dejar de ingresar ciudades o cualquier tecla para seguir');
-          Readln(opcion)
+          Readln(opcion);
+
      END;
 END;
 Procedure Alta_empresas;
