@@ -55,19 +55,24 @@ BEGIN
      UNTIL(clave=intento_clave)OR (cont>=3);
      ingreso_clave:=(clave=intento_clave);
 END;
-Procedure ordenar_ciudades(var c:ciu;largo:integer);
+Procedure ordenar_ciudades;
 Var aux:string[20];
-    i,j,h:integer;
+    i,j,h,aux2:integer;
 BEGIN
-     FOR i:= 1 to (largo-1) do
-         FOR j:=i+1 to largo do
-             IF c[i,1]>c[j,1] THEN FOR h:=1 to 2 do
-                BEGIN
-                     aux:=c[i,h];
-                     c[i,h]:=c[j,h];
-                     c[j,h]:=aux
-                END
-
+     FOR i:= 1 to (c_ciudades-1) do
+         FOR j:=i+1 to c_ciudades do
+             IF ciudades[i,1]>ciudades[j,1] THEN
+             BEGIN
+                  aux2:= cont_ciu[i];  {ordeno tambien los contadores de las ciudades}
+                  cont_ciu[i]:= cont_ciu[j];
+                  cont_ciu[j]:=aux2;
+                  FOR h:=1 to 2 do
+                      BEGIN
+                           aux:=ciudades[i,h];
+                           ciudades[i,h]:=ciudades[j,h];
+                           ciudades[j,h]:=aux
+                      END
+             END
 END;
 Procedure Alta_ciudades;
 Var cod_ciudad:string[3];
@@ -84,7 +89,7 @@ BEGIN
           ciudades[c_ciudades,1]:=cod_ciudad;
           Write('Ingrese el nombre de la ciudad: ');
           Readln(ciudades[c_ciudades,2]);
-          ordenar_ciudades(ciudades,c_ciudades);
+          ordenar_ciudades();
           ClrScr;
           Writeln('Presione 0 para dejar de ingresar ciudades o cualquier tecla para seguir');
           Readln(opcion)
