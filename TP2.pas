@@ -113,9 +113,52 @@ BEGIN
 
      END;
 END;
+Function Bus_cod_em(ce:string):integer;
+var i:integer;
+begin
+      i:=0;
+      repeat
+            i:=i+1;
+      until(empresas[i,1]=ce)or(i=(c_empresas-1));
+      if((empresas[i,1]=ce) and (c_empresas<>1))then
+                              begin
+                              Bus_cod_em:=i;
+                              end
+                              else
+                              begin
+                              Bus_cod_em := 0;
+                              end;
+end;
 Procedure Alta_empresas;
+Var opcion:char; cod_ciudad:string[3];
 BEGIN
-
+     ClrScr;
+     Writeln('Presione 0 para dejar empresas');
+     Readln(opcion);
+     While opcion <>'0' do
+           BEGIN
+           c_empresas:=c_empresas+1;
+           repeat
+                 Writeln('Ingrese el codigo de la empresa');
+                 Readln(empresas[c_empresas,1]);
+           until Bus_cod_em(empresas[c_empresas,1])=0;
+           Writeln('Ingrese el nombre de la empresa');
+           Readln(empresas[c_empresas,2]);
+           Writeln('Ingrese direccion de la empresa');
+           Readln(empresas[c_empresas,3]);
+           Writeln('Ingrese el mail de la empresa');
+           Readln(empresas[c_empresas,4]);
+           Writeln('Ingrese el telefono de la empresa');
+           Readln(empresas[c_empresas,5]);
+           repeat
+                 Writeln('Ingrese el codigo de la ciudad');
+                 Readln(cod_ciudad);
+           until Bus_cod_ciu(cod_ciudad)<>0;
+           empresas[c_empresas,6]:=cod_ciudad;
+           cont_ciu[Bus_cod_ciu(cod_ciudad)]:=cont_ciu[Bus_cod_ciu(cod_ciudad)]+1;
+           Writeln('Presione 0 para dejar de ingresar empresas');
+           Readln(opcion);
+           END
 END;
 Procedure Alta_proy;
 BEGIN
