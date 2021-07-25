@@ -149,6 +149,15 @@ BEGIN
       IF (empresas[i,1]=ce) AND (c_empresas<>1)THEN Bus_cod_em:=i
                                                ELSE Bus_cod_em:=0;
 END;
+Procedure Mostrar_empresas;{funcion auxiliar para mostrar empresas}
+Var i:integer;
+BEGIN
+     ClrScr;
+     Writeln('Empresas:');
+     For i:= 1 to c_empresas do
+          write(empresas[i,1],'   ', empresas[i,2], '  ', empresas[i,3], '  ', empresas[i,4], '  ', empresas[i,5], '  ', empresas[i,6]);
+     Readln();
+END;
 Procedure Ciudad_mas_empresas;{muestra las ciudades con mas cantidad de empresas}
 Var maximo,i:integer;
 begin
@@ -198,6 +207,7 @@ BEGIN
                 until Bus_cod_ciu(cod_ciudad)<>0; {valida que el codigo se ciudad sea uno existente}
                 empresas[c_empresas,6]:=cod_ciudad;
                 cont_ciu[Bus_cod_ciu(cod_ciudad)]:=cont_ciu[Bus_cod_ciu(cod_ciudad)]+1;{sumo 1 al contador de empresas de esa ciudad}
+                Mostrar_empresas();{auxiliar}
                 ClrScr;
                 Writeln('Presione 0 para dejar de ingresar empresas');
                 Readln(opcion);
