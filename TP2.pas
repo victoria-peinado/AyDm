@@ -6,7 +6,7 @@ clave_em='hola123';
 clave_cli='soy cliente';
 
 {MAXIMOS ARRAYS}
-max_ciu=2; {hay que poner 5}
+max_ciu=5;
 max_e=4;
 max_p=4;{minimo 1 por empresa}
 max_cli=3;
@@ -81,7 +81,18 @@ BEGIN
                       END
              END
 END;
-
+Procedure Mostrar_ciudades;{funcion axiliar para ver que todo anduvo bien en el ordenamiento}
+Var i:integer;
+BEGIN
+     ClrScr;
+     Writeln('Ciudades ordenadas');
+     For i:= 1 to c_ciudades do
+     BEGIN
+          write(ciudades[i,1],'   ', ciudades[i,2], '  ');
+          writeln(cont_ciu[i])
+     END;
+     Readln();
+END;
 Function Bus_cod_ciu(cc: string):integer; {dado un codigo de ciudad devuelve la "fila" en la que se encontro, o 0 si no se encontro.BUS DICOTOMICA}
 Var q:boolean;
     comi,fin,medio:integer;
@@ -114,7 +125,8 @@ BEGIN
           ciudades[c_ciudades,1]:=cod_ciudad;
           Write('Ingrese el nombre de la ciudad: ');
           Readln(ciudades[c_ciudades,2]);
-          ordenar_ciudades();
+          ordenar_ciudades();{despues de ingresar una nueva ciudad tengo que re ordenar el array}
+          Mostrar_ciudades;
           ClrScr;
           Writeln('Presione 0 para dejar de ingresar ciudades o cualquier tecla para seguir');
           Readln(opcion);
@@ -280,7 +292,7 @@ BEGIN
     ClrScr;
  	Writeln('Ingrese 0 para dejar de ingresar clientes');
  Readln(opcion);
- 	While (opcion <> '0')and (max_cli<>c_lientes) do
+ 	While (opcion <> '0')and (max_cli<>c_clientes) do
 		BEGIN
  			 c_clientes:=c_clientes+1;
  		 	Writeln('Ingrese nombre y apellido: ');
