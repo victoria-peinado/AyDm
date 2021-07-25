@@ -126,7 +126,7 @@ BEGIN
           Write('Ingrese el nombre de la ciudad: ');
           Readln(ciudades[c_ciudades,2]);
           ordenar_ciudades();{despues de ingresar una nueva ciudad tengo que re ordenar el array}
-          Mostrar_ciudades;
+          Mostrar_ciudades; {auxiliar muestra las ciudades ordenadas}
           ClrScr;
           Writeln('Presione 0 para dejar de ingresar ciudades o cualquier tecla para seguir');
           Readln(opcion);
@@ -145,9 +145,9 @@ BEGIN
       i:=0;
       REPEAT
             i:=i+1;
-      UNTIL (empresas[i,1]=ce) OR (i=(c_empresas-1));
-      IF (empresas[i,1]=ce) AND (c_empresas<>1)THEN Bus_cod_em:=i
-                                               ELSE Bus_cod_em:=0;
+      UNTIL (empresas[i,1]=ce) OR (i>=(c_empresas-1));
+      IF (empresas[i,1]=ce) THEN Bus_cod_em:=i
+                            ELSE Bus_cod_em:=0;
 END;
 Procedure Mostrar_empresas;{funcion auxiliar para mostrar empresas}
 Var i:integer;
@@ -155,7 +155,7 @@ BEGIN
      ClrScr;
      Writeln('Empresas:');
      For i:= 1 to c_empresas do
-          write(empresas[i,1],'   ', empresas[i,2], '  ', empresas[i,3], '  ', empresas[i,4], '  ', empresas[i,5], '  ', empresas[i,6]);
+          writeln(empresas[i,1],'   ', empresas[i,2], '  ', empresas[i,3], '  ', empresas[i,4], '  ', empresas[i,5], '  ', empresas[i,6]);
      Readln();
 END;
 Procedure Ciudad_mas_empresas;{muestra las ciudades con mas cantidad de empresas}
@@ -181,7 +181,7 @@ end;
 
 Procedure Alta_empresas;{ingreso de empresas}
 Var opcion:char;
-    cod_ciudad:string[3];
+    cod_ciudad:string[3];e:string;
 BEGIN
      ClrScr;
      Writeln('Presione 0 para dejar de ingresar empresas');
@@ -191,8 +191,9 @@ BEGIN
                 c_empresas:=c_empresas+1;
                 repeat
                       Writeln('Ingrese el codigo de la empresa: ');
-                      Readln(empresas[c_empresas,1]);
-                until Bus_cod_em(empresas[c_empresas,1])=0;{valida que el codigo de empresa sea unico}
+                      Readln(e);
+                until Bus_cod_em(e)=0;{valida que el codigo de empresa sea unico}
+                empresas[c_empresas,1]:=e;
                 Writeln('Ingrese el nombre de la empresa: ');
                 Readln(empresas[c_empresas,2]);
                 Writeln('Ingrese direccion de la empresa: ');
@@ -207,7 +208,7 @@ BEGIN
                 until Bus_cod_ciu(cod_ciudad)<>0; {valida que el codigo se ciudad sea uno existente}
                 empresas[c_empresas,6]:=cod_ciudad;
                 cont_ciu[Bus_cod_ciu(cod_ciudad)]:=cont_ciu[Bus_cod_ciu(cod_ciudad)]+1;{sumo 1 al contador de empresas de esa ciudad}
-                Mostrar_empresas();{auxiliar}
+                Mostrar_empresas();{funcion auxiliar para mostrar las empresa}
                 ClrScr;
                 Writeln('Presione 0 para dejar de ingresar empresas');
                 Readln(opcion);
@@ -215,6 +216,7 @@ BEGIN
      IF (max_e=c_empresas) THEN
                            Begin
                                 Writeln('Maximo de empresas alcanzado');
+                                Readln();
                            End;
      Ciudad_mas_empresas();{llamada a funcion para mostrar las ciudades con mas empresas}
      REadln();
@@ -226,12 +228,24 @@ begin
 i:=0;
 repeat
     		i:=i+1;
-until (proyectos[i,1]=cp) or (i=(c_proyectos-1));
- 	if ((proyectos[i,1]=cp) and (c_proyectos<>1)) then Bus_cod_proy := i
+until (proyectos[i,1]=cp) or (i>=(c_proyectos-1));
+ 	if (proyectos[i,1]=cp)  then Bus_cod_proy := i
         else Bus_cod_proy := 0;
 end;
+Procedure Mostrar_proyectos;{funcion auxiliar para mostrar proyectos}
+Var i:integer;
+BEGIN
+     ClrScr;
+     Writeln('Proyectos:');
+     For i:= 1 to c_proyectos do
+     BEGIN
+          write(proyectos[i,1],'   ', proyectos[i,2], '  ', proyectos[i,3], '  ', proyectos[i,4], '  ', proyectos[i,5], '  ');
+          writeln(pcant[i]);
+     END;
+     Readln();
+END;
 Procedure Alta_proy; {ingreso de proyectos}
-Var opcion,i:Char;cod_ciudad:string[3];
+Var opcion,i:Char;cod_ciudad:string[3];e:string;
 BEGIN
      ClrScr;
      WRITELN('Presione 0 para dejar de ingresar proyectos');
@@ -241,12 +255,14 @@ BEGIN
            c_proyectos:=c_proyectos+1;
            repeat
                  WRITELN('Ingrese codigo de proyecto');
-                 READLN(proyectos[c_proyectos,1]);
-           until Bus_cod_proy(proyectos[c_proyectos,1])=0; {valida que el codigo de proyecto sea unico}
+                 READLN(e);
+           until Bus_cod_proy(e)=0; {valida que el codigo de proyecto sea unico}
+           proyectos[c_proyectos,1]:=e;
            repeat
                  WRITELN('Ingrese el codigo de la empresa');
-                 READLN(proyectos[c_proyectos,2]);
-           until Bus_cod_em(proyectos[c_proyectos,2])<>0; {valida que el codigo de empresa exista}
+                 READLN(e);
+           until Bus_cod_em(e)<>0; {valida que el codigo de empresa exista}
+           proyectos[c_proyectos,2]:=e;
            repeat
                  WRITELN('Ingrese la etapa del proyecto');
                  READLN(i);
@@ -264,11 +280,16 @@ BEGIN
            proyectos[c_proyectos,5]:=cod_ciudad;
            WRITELN('Ingrese la cantidad de productos del proyecto');
            READLN(pcant[c_proyectos]);
+           Mostrar_proyectos();{funcion auxiliar que muestras los proyectos}
            ClrScr;
            WRITELN('Presione 0 para dejar de ingresar proyectos');
            READLN(opcion);
            end;
-     if (max_p=c_proyectos) then WRITELN('Maximo de proyectos alcanzado');
+     if (max_p=c_proyectos) then
+                            Begin
+                                WRITELN('Maximo de proyectos alcanzado');
+                                Readln();
+                           End;
 END;
 {PARTE PRODUCTOS}
 Procedure Alta_prod;
@@ -295,9 +316,17 @@ BEGIN
 END;
 
 {PARTE CLIENTES}
+Procedure Mostrar_clientes;{funcion auxiliar para mostrar clientes}
+Var i:integer;
+BEGIN
+     ClrScr;
+     Writeln('Clientes:');
+     For i:= 1 to c_clientes do
+          writeln(clientes[i,1],'   ', clientes[i,2]);
+     Readln();
+END;
 Procedure Alta_cliente;{ingreso de clientes}
 Var opcion:char;
-
 BEGIN
     ClrScr;
  	Writeln('Ingrese 0 para dejar de ingresar clientes');
@@ -309,10 +338,17 @@ BEGIN
   			Readln(clientes[c_clientes,1]);
   			Writeln('Ingrese mail: ');
   			Readln(clientes[c_clientes,2]);
-  			Write('Ingrese 0 para dejar de ingresar clientes');
+            Mostrar_clientes();{fincion auxiliar para mostrar clientes}
+            ClrScr;
+  			Writeln('Ingrese 0 para dejar de ingresar clientes');
   			Readln(opcion);
 		END;
- 	IF max_cli=c_clientes THEN Write('Maximo de clientes alcanzado');
+ 	IF max_cli=c_clientes THEN
+                          Begin
+                                 Write('Maximo de clientes alcanzado');
+                                Readln();
+                           End;
+
 END;
 
 procedure Mostrar_etapa(etapa:string);{mustra segun la letra de la etapa la palabra correspondiente}
@@ -346,7 +382,9 @@ REPEAT
                Writeln('El nombre de la empresa es: ',empresas[fila_em,2]);{dada la fila de dicho codigo te muestra el nombre correspondiente}
                fila_ciu:=bus_cod_ciu(proyectos[i,5]);{te da la fila en la que se encontro el codigo de ciudad en el array de ciudaddes}
                Writeln('El nombre de la ciudad es: ',ciudades[fila_ciu,2]); {dada la fila de dicho codigo te muestra el nombre correspondiente}
+
           END;
+          Readln();
     END;
 END;
 Procedure Menu_clientes;
