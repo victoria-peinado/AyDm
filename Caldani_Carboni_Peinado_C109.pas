@@ -146,7 +146,7 @@ BEGIN
       i:=0;
       REPEAT
             i:=i+1;
-      UNTIL (empresas[i,1]=ce) OR (i>=(c_empresas-1));
+      UNTIL (empresas[i,1]=ce) OR (i>=c_empresas);
       IF (empresas[i,1]=ce) THEN Bus_cod_em:=i
                             ELSE Bus_cod_em:=0;
 END;
@@ -189,11 +189,11 @@ BEGIN
      Readln(opcion);
      While (opcion<>'0') AND (max_e<>c_empresas) DO
            BEGIN
-                c_empresas:=c_empresas+1;
                 repeat
                       Writeln('Ingrese el codigo de la empresa: ');
                       Readln(e);
                 until Bus_cod_em(e)=0;{valida que el codigo de empresa sea unico}
+                c_empresas:=c_empresas+1;
                 empresas[c_empresas,1]:=e;
                 Writeln('Ingrese el nombre de la empresa: ');
                 Readln(empresas[c_empresas,2]);
@@ -229,7 +229,7 @@ begin
 i:=0;
 repeat
     		i:=i+1;
-until (proyectos[i,1]=cp) or (i>=(c_proyectos-1));
+until (proyectos[i,1]=cp) or (i>=c_proyectos);
  	if (proyectos[i,1]=cp)  then Bus_cod_proy := i
         else Bus_cod_proy := 0;
 end;
@@ -253,11 +253,11 @@ BEGIN
      READLN(opcion);
      while (opcion<>'0') and (c_proyectos<>max_p) do
            begin
-           c_proyectos:=c_proyectos+1;
            repeat
                  WRITELN('Ingrese codigo de proyecto');
                  READLN(e);
-           until Bus_cod_proy(e)=0; {valida que el codigo de proyecto sea unico}
+           until Bus_cod_proy(e)=0; {valida que el codigo de proyecto sea }
+           c_proyectos:=c_proyectos+1;
            proyectos[c_proyectos,1]:=e;
            repeat
                  WRITELN('Ingrese el codigo de la empresa');
@@ -358,9 +358,9 @@ BEGIN
 c:=etapa[1];{como el case no se puede hacer con un string, y etapa es un string de una sola letra, se lo fuerza a ser char}
  Writeln('El estado de proyectos es: ');
  CASE c OF
-      'P': Write('Preventa');
-      'O': Write('Obras');
-      'T': Write('Terminado');
+      'P': Writeln('Preventa');
+      'O': Writeln('Obras');
+      'T': Writeln('Terminado');
  END
 END;
 
@@ -385,8 +385,9 @@ REPEAT
                Writeln('El nombre de la ciudad es: ',ciudades[fila_ciu,2]); {dada la fila de dicho codigo te muestra el nombre correspondiente}
 
           END;
-          Readln();
+
     END;
+    Readln();
 END;
 Procedure Menu_clientes;
 Var opcion:char;
