@@ -1,4 +1,4 @@
-{Caldani Juliana,Carboni Eduardo Daniel,Peinado Victoria. Todos comision 109}
+{Gayozo Alejandro,Carboni Eduardo Daniel,Peinado Victoria. Todos comision 109}
 program ordenarCadena(input,output);
 uses crt;
 Const
