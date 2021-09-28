@@ -13,7 +13,7 @@ max_p=4;{minimo 1 por empresa}
 max_cli=3;
 TYPE
 empr=array[1..max_e,1..6]of string[20];
-ciu=array[1..max_ciu,1..2] of string[20];
+
 cli=array[1..max_cli,1..2]of string[20];
 proy=array[1..max_p,1..5]of string[10];
 proy_cant=array[1..max_p]of integer; {este tipo es para guardar la cantidad de productos de los proyectos}
@@ -22,13 +22,13 @@ ciudad= record                            // tipos recod y file para ciudad
               cod_ciudad: string[3];
               nombre: string[25];
         end;
-ciudades = file of rciu;
+ciudades = file of ciudad;
 VAR
 {CREACION ARRAYS}
 ciu:ciudad; // variavles para ciudad
 aciu:ciudades;
 empresas:empr;
-ciudades:ciu;
+
 clientes:cli;
 proyectos:proy;
 pcant:proy_cant; {array con la cant de productos por proyecto}
@@ -76,8 +76,7 @@ BEGIN
 END;
 {PARTE CIUDADES}
 Procedure ordenar_ciudades;{ordena ciudades de menor a mayor y deja los vacios al final}
-Var aux:string[20];
-    i,j:integer;
+Var i,j:integer;
     aux:ciudad; //registro axiliar para poder ordena
 
 BEGIN
@@ -88,7 +87,7 @@ BEGIN
               seek(aciu,i);
               read(aciu,ciu);
               seek(aciu,j);
-              read(aciu,aux)
+              read(aciu,aux);
               IF ciu.cod_ciudad > aux.cod_ciudad THEN
               BEGIN
                seek(aciu,i);
@@ -108,6 +107,7 @@ BEGIN
      BEGIN
           read(aciu,ciu);
           write(ciu.cod_ciudad,'  ',ciu.nombre);
+          writeln();
      END;
      Readln();
 END;
@@ -118,7 +118,7 @@ BEGIN
      q:=FALSE;
      comi:=0;
      medio:=0;
-     fin:=filesize(acui)-1;
+     fin:=filesize(aciu)-1;
      While (comi<=fin)and (q=false)do
      BEGIN
            medio:=(comi+fin)DIV 2;
@@ -128,13 +128,13 @@ BEGIN
                                    ELSE IF ciu.cod_ciudad>cc THEN fin:=medio-1
                                                                 ELSE comi:=medio+1;
      END;
-     IF q THEN Bus_cod_ciu:=medio ELSE Bus_cod_ciu:=0 //seria medio +1??????
+     IF q THEN Bus_cod_ciu:=medio+1 ELSE Bus_cod_ciu:=0 //te devuelve la pos+1 ya que el 0 es no se encontro
 END;
 Procedure Alta_ciudades;{ingreso de ciudades}
 Var cod_ciudad:string[3];
-    opcion:char;
 BEGIN
-     seek(aciu,fileseze(aciu));//puntero al final del archivo
+     if not(eof(aciu))then seek(aciu,filesize(aciu))//puntero al final del archivo
+                           else seek(aciu,0); rewrite(aciu);
      ClrScr;
      REPEAT
            Write('Ingrese el codigo de la ciudad: ');
@@ -145,6 +145,7 @@ BEGIN
           ciu.cod_ciudad:=cod_ciudad;
           Write('Ingrese el nombre de la ciudad: ');
           Readln(ciu.nombre);
+          write(aciu,ciu);
           ordenar_ciudades();{despues de ingresar una nueva ciudad tengo que re ordenar el array}
           Mostrar_ciudades; {auxiliar muestra las ciudades ordenadas}
           ClrScr;
@@ -174,7 +175,7 @@ BEGIN
           writeln(empresas[i,1],'   ', empresas[i,2], '  ', empresas[i,3], '  ', empresas[i,4], '  ', empresas[i,5], '  ', empresas[i,6]);
      Readln();
 END;
-Procedure Ciudad_mas_empresas;{muestra las ciudades con mas cantidad de empresas}
+(*Procedure Ciudad_mas_empresas;{muestra las ciudades con mas cantidad de empresas}
 Var maximo,i:integer;
 begin
 maximo:=0;
@@ -193,7 +194,7 @@ for i:=1 to c_ciudades do {muestra todas las ciudades que tiene la cantidad maxi
       					Writeln(ciudades[i,2]);
     					end;
 end;
-end;
+end;*)
 
 Procedure Alta_empresas;{ingreso de empresas}
 Var opcion:char;
@@ -234,7 +235,7 @@ BEGIN
                                 Writeln('Maximo de empresas alcanzado');
                                 Readln();
                            End;
-     Ciudad_mas_empresas();{llamada a funcion para mostrar las ciudades con mas empresas}
+     //Ciudad_mas_empresas();{llamada a funcion para mostrar las ciudades con mas empresas}
      REadln();
 END;
 {PARTE PROYECTOS}
@@ -397,7 +398,7 @@ REPEAT
               fila_em:=bus_cod_em(proyectos[i,2]); {te da la fila en la que se encontro el codigo de empresa en el array de empresas}
                Writeln('El nombre de la empresa es: ',empresas[fila_em,2]);{dada la fila de dicho codigo te muestra el nombre correspondiente}
                fila_ciu:=bus_cod_ciu(proyectos[i,5]);{te da la fila en la que se encontro el codigo de ciudad en el array de ciudaddes}
-               Writeln('El nombre de la ciudad es: ',ciudades[fila_ciu,2]); {dada la fila de dicho codigo te muestra el nombre correspondiente}
+               //Writeln('El nombre de la ciudad es: ',ciudades[fila_ciu,2]); {dada la fila de dicho codigo te muestra el nombre correspondiente}
 
           END;
 
@@ -437,7 +438,7 @@ BEGIN {Programa principal}
                                        ELSE writeln('Clave incorrecta');
                 '2': IF Ingreso_clave(clave_cli)THEN Menu_clientes()
                                        ELSE writeln('Clave incorrecta');
-                ELSE
+                '0':close(aciu);
            END
      UNTIL (opcion='0');
 END.
