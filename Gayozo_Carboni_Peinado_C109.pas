@@ -18,8 +18,15 @@ cli=array[1..max_cli,1..2]of string[20];
 proy=array[1..max_p,1..5]of string[10];
 proy_cant=array[1..max_p]of integer; {este tipo es para guardar la cantidad de productos de los proyectos}
 ciu_cont=array[1..max_ciu]of integer;{este tipo es para guardar la cantidad de empresas que hay en cada ciudad}
+ciudad= record                            // tipos recod y file para ciudad
+              cod_ciudad: string[3];
+              nombre: string[25];
+        end;
+ciudades = file of rciu;
 VAR
 {CREACION ARRAYS}
+rciu:ciudad; // variavles para ciudad
+acius:ciudades;
 empresas:empr;
 ciudades:ciu;
 clientes:cli;
@@ -33,6 +40,11 @@ opcion:char;
 Procedure Inicializar; {inicializa los contadores y el array cont_ciu en 0}
 Var i:integer;
 BEGIN
+     assign(acius,'C:\TP3\CIUDADES.DAT');
+     {$I-} // abro archivos y si no existen los creo
+           reset(acius);
+           if ioresult= 2 then rewrite (archivo);
+     {$I+}
      c_empresas:=0;
      c_ciudades:=0;
      c_proyectos:=0;
