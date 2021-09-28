@@ -25,8 +25,8 @@ ciudad= record                            // tipos recod y file para ciudad
 ciudades = file of rciu;
 VAR
 {CREACION ARRAYS}
-rciu:ciudad; // variavles para ciudad
-acius:ciudades;
+ciu:ciudad; // variavles para ciudad
+aciu:ciudades;
 empresas:empr;
 ciudades:ciu;
 clientes:cli;
@@ -40,10 +40,10 @@ opcion:char;
 Procedure Inicializar; {inicializa los contadores y el array cont_ciu en 0}
 Var i:integer;
 BEGIN
-     assign(acius,'C:\TP3\CIUDADES.DAT');
+     assign(aciu,'C:\TP3\CIUDADES.DAT');
      {$I-} // abro archivos y si no existen los creo
-           reset(acius);
-           if ioresult= 2 then rewrite (archivo);
+           reset(aciu);
+           if ioresult= 2 then rewrite (aciu);
      {$I+}
      c_empresas:=0;
      c_ciudades:=0;
@@ -77,33 +77,37 @@ END;
 {PARTE CIUDADES}
 Procedure ordenar_ciudades;{ordena ciudades de menor a mayor y deja los vacios al final}
 Var aux:string[20];
-    i,j,h,aux2:integer;
+    i,j:integer;
+    aux:ciudad; //registro axiliar para poder ordena
+
 BEGIN
-     FOR i:= 1 to (c_ciudades-1) do
-         FOR j:=i+1 to c_ciudades do
-             IF ciudades[i,1]>ciudades[j,1] THEN
-             BEGIN
-                  aux2:= cont_ciu[i];  {ordeno tambien los contadores de las ciudades}
-                  cont_ciu[i]:= cont_ciu[j];
-                  cont_ciu[j]:=aux2;
-                  FOR h:=1 to 2 do
-                      BEGIN
-                           aux:=ciudades[i,h];
-                           ciudades[i,h]:=ciudades[j,h];
-                           ciudades[j,h]:=aux
-                      END
-             END
+     seek(aciu,0);//apunto al inicio
+     FOR i:= 0 to filesize(aciu)-2 do
+         FOR j:=i+1 to filesize(aciu)-1 do
+         BEGIN
+              seek(aciu,i);
+              read(aciu,ciu);
+              seek(aciu,j);
+              read(aciu,aux)
+              IF ciu.cod_ciudad > aux.cod_ciudad THEN
+              BEGIN
+               seek(aciu,i);
+               write(aciu,aux);
+               seek(aciu,j);
+               write(aciu,ciu);
+             END;
+         END;
 END;
 
 Procedure Mostrar_ciudades;{funcion axiliar para ver que todo anduvo bien en el ordenamiento}
-Var i:integer;
 BEGIN
      ClrScr;
+     seek(aciu,0);
      Writeln('Ciudades ordenadas');
-     For i:= 1 to c_ciudades do
+     while not(eof(aciu))do
      BEGIN
-          write(ciudades[i,1],'   ', ciudades[i,2], '  ');
-          writeln(cont_ciu[i])
+          read(aciu,ciu);
+          write(ciu.cod_ciudad,'  ',ciu.nombre);
      END;
      Readln();
 END;
@@ -112,45 +116,43 @@ Var q:boolean;
     comi,fin,medio:integer;
 BEGIN
      q:=FALSE;
-     comi:=1;
-     fin:=c_ciudades;
-     REPEAT
+     comi:=0;
+     medio:=0;
+     fin:=filesize(acui)-1;
+     While (comi<=fin)and (q=false)do
+     BEGIN
            medio:=(comi+fin)DIV 2;
-           IF ciudades[medio,1]=cc THEN q:=TRUE
-                                   ELSE IF ciudades[medio,1]>cc THEN fin:=medio-1
+           seek(aciu,medio);
+           read(aciu,ciu);
+           IF ciu.cod_ciudad=cc THEN q:=TRUE
+                                   ELSE IF ciu.cod_ciudad>cc THEN fin:=medio-1
                                                                 ELSE comi:=medio+1;
-     UNTIL (comi>fin) OR q;
-     IF q THEN Bus_cod_ciu:=medio ELSE Bus_cod_ciu:=0
+     END;
+     IF q THEN Bus_cod_ciu:=medio ELSE Bus_cod_ciu:=0 //seria medio +1??????
 END;
 Procedure Alta_ciudades;{ingreso de ciudades}
 Var cod_ciudad:string[3];
     opcion:char;
 BEGIN
+     seek(aciu,fileseze(aciu));//puntero al final del archivo
      ClrScr;
-     Writeln('Presione 0 para dejar de ingresar ciudades o cualquier tecla para seguir');
-     Readln(opcion);
-     While (opcion <>'0')and(max_ciu<>c_ciudades) do{si ya se llego al maximo de ciudades o se ingreso 0 no se agregan mas ciudades}
+     REPEAT
+           Write('Ingrese el codigo de la ciudad: ');
+           Readln(cod_ciudad);
+     UNTIL (cod_ciudad='0')or(Bus_cod_ciu(cod_ciudad)=0); {valida que el codigo de ciudad sea unico}
+     While (cod_ciudad <>'0') do
      BEGIN
-          c_ciudades:=c_ciudades+1;
-          REPEAT
-                Write('Ingrese el codigo de la ciudad: ');
-                Readln(cod_ciudad);
-          UNTIL Bus_cod_ciu(cod_ciudad)=0; {valida que el codigo de ciudad sea unico}
-          ciudades[c_ciudades,1]:=cod_ciudad;
+          ciu.cod_ciudad:=cod_ciudad;
           Write('Ingrese el nombre de la ciudad: ');
-          Readln(ciudades[c_ciudades,2]);
+          Readln(ciu.nombre);
           ordenar_ciudades();{despues de ingresar una nueva ciudad tengo que re ordenar el array}
           Mostrar_ciudades; {auxiliar muestra las ciudades ordenadas}
           ClrScr;
-          Writeln('Presione 0 para dejar de ingresar ciudades o cualquier tecla para seguir');
-          Readln(opcion);
-
+          REPEAT
+                Write('Ingrese el codigo de la ciudad: ');
+                Readln(cod_ciudad);
+          UNTIL (cod_ciudad='0')or(Bus_cod_ciu(cod_ciudad)=0); {valida que el codigo de ciudad sea unico}
      END;
-     IF (max_ciu=c_ciudades)THEN
-     BEGIN
-          Writeln('Maximo de ciudades alcanzado');
-          REadln();
-    END;
 END;
 {PARTE EMPRESAS}
 Function Bus_cod_em(ce:string):integer; {dado un codigo de empresa devuelve la "fila" en la que se encontro, o 0 si no se encontro.BUS SECUENCAL}
