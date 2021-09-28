@@ -133,8 +133,7 @@ END;
 Procedure Alta_ciudades;{ingreso de ciudades}
 Var cod_ciudad:string[3];
 BEGIN
-     if not(eof(aciu))then seek(aciu,filesize(aciu))//puntero al final del archivo
-                           else seek(aciu,0); rewrite(aciu);
+     seek(aciu,filesize(aciu));//puntero al final del archivo
      ClrScr;
      REPEAT
            Write('Ingrese el codigo de la ciudad: ');
