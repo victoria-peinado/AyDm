@@ -7,17 +7,9 @@ clave_em='hola123';
 clave_cli='soy cliente';
 
 {MAXIMOS ARRAYS}
-max_ciu=5;
-max_e=4;
-max_p=4;{minimo 1 por empresa}
 max_cli=3;
 TYPE
-empr=array[1..max_e,1..6]of string[20];
-
 cli=array[1..max_cli,1..2]of string[20];
-proy=array[1..max_p,1..5]of string[10];
-proy_cant=array[1..max_p]of integer; {este tipo es para guardar la cantidad de productos de los proyectos}
-ciu_cont=array[1..max_ciu]of integer;{este tipo es para guardar la cantidad de empresas que hay en cada ciudad}
 // tipos recod y file para ciudad
 ciudad = record
               cod_ciudad: string[3];
@@ -35,7 +27,16 @@ empresa = record
                cod_ciudad:string[3];
          end;
 empresas = file of empresa;
-
+//tipos de datos para proyectos
+proyecto = record
+                 cod_proy:string[3];
+                 cod_emp:string[3];
+                 cod_ciudad:string[3];
+                 etapa:string[1];
+                 tipo:string[1];
+                 cant: array[1..3]of integer;
+           end;
+proyectos = file ef proyecto;
 VAR
 {CREACION ARRAYS}
 // variavles para ciudad
@@ -44,16 +45,15 @@ aciu:ciudades;
 //variables para empresa
 e:empresa;
 ae:empresas;
-
+// variavles para proyecto
+py:proyecto;
+apy:proyectos;
 
 clientes:cli;
-proyectos:proy;
-pcant:proy_cant; {array con la cant de productos por proyecto}
-cont_ciu:ciu_cont;{array con la cantidad empresas por ciudad}
-
 {CONTADORES para saber donde esta el ultimmo elemento de cada array}
-c_empresas,c_ciudades,c_proyectos,c_clientes:integer;
+c_clientes:integer;
 opcion:char;
+
 Procedure Inicializar; {inicializa los contadores y el array cont_ciu en 0}
 Var i:integer;
 BEGIN
@@ -126,8 +126,7 @@ BEGIN
      while not(eof(aciu))do
      BEGIN
           read(aciu,ciu);
-          write(ciu.cod_ciudad,'  ',ciu.nombre);
-          writeln();
+          writeln(ciu.cod_ciudad,'  ',ciu.nombre);
      END;
      Readln();
 END;
@@ -182,7 +181,7 @@ BEGIN
            read(ae,e);
 
      IF (filesize(ae)=0) THEN Bus_cod_em:=0
-                         ELSE IF ce=e.cod_emp THEN Bus_cod_em:=filepos(ae)+1
+                         ELSE IF ce=e.cod_emp THEN Bus_cod_em:=filepos(ae)
                                               ELSE Bus_cod_em:=0;
 END;
 Procedure Mostrar_empresas;{funcion auxiliar para mostrar empresas}
@@ -193,8 +192,7 @@ BEGIN
      while not(eof(ae))do
      BEGIN
           read(ae,e);
-          write(e.cod_emp,'  ',e.nombre);
-          writeln();
+          writeln(e.cod_emp,'  ',e.nombre,'  ',e.ciudad);
      END;
      Readln();
 END;
@@ -221,17 +219,17 @@ end;*)
 
 Procedure Alta_empresas;{ingreso de empresas}
 Var
-    cod_ciudad:string[3];ce:string[3];
+    aux:string[3];
 BEGIN
      seek(ae,filesize(ae)); //puntero al final del archivo
      ClrScr;
      repeat
            Writeln('Ingrese el codigo de la empresa o 0 para salir: ');
-           Readln(ce);
-     until (ce='0')or (Bus_cod_em(ce)=0);{valida que el codigo de empresa sea unico}
-     While (ce<>'0')DO
+           Readln(aux);
+     until (aux='0')or (Bus_cod_em(aux)=0);{valida que el codigo de empresa sea unico}
+     While (aux<>'0')DO
            BEGIN
-                e.cod_emp:=ce;
+                e.cod_emp:=aux;
                 Writeln('Ingrese el nombre de la empresa: ');
                 Readln(e.nombre);
                 Writeln('Ingrese direccion de la empresa: ');
@@ -242,92 +240,87 @@ BEGIN
                 Readln(e.telefono);
                 repeat
                       Writeln('Ingrese el codigo de la ciudad: ');
-                      Readln(cod_ciudad);
-                until Bus_cod_ciu(cod_ciudad)<>0; {valida que el codigo se ciudad sea uno existente}
-                e.cod_ciudad:=cod_ciudad;
-                seek(aciu,Bus_cod_ciu(cod_ciudad)-1);//traigo la ciudad a memoria
+                      Readln(aux);
+                until Bus_cod_ciu(aux)<>0; {valida que el codigo se ciudad sea uno existente}
+                e.cod_ciudad:=aux;
+                write(ae,e);                        //guardo todo en el archivo empresas
+                seek(aciu,Bus_cod_ciu(aux)-1);//traigo la ciudad a memoria
                 read(aciu,ciu);
                 ciu.cant_e:=ciu.cant_e+1;
-                seek(aciu,Bus_cod_ciu(cod_ciudad)-1);
+                seek(aciu,Bus_cod_ciu(aux)-1);
                 write(aciu,ciu);                     //guardo la ciudad con su registro editado
                 Mostrar_empresas();{funcion auxiliar para mostrar las empresa}
                 ClrScr;
                 repeat
                       Writeln('Ingrese el codigo de la empresa o 0 para salir: ');
-                      Readln(ce);
-                until (ce='0')or (Bus_cod_em(ce)=0);{valida que el codigo de empresa sea unico}
+                      Readln(aux);
+                until (aux='0')or (Bus_cod_em(aux)=0);{valida que el codigo de empresa sea unico}
            END;
-     Readln();
 END;
 {PARTE PROYECTOS}
 Function Bus_cod_proy(cp:string):integer; {dado un codigo de proyecto devuelve la "fila" en la que se encontro, o 0 si no se encontro.BUS SECUENCAL}
-var i:integer;
 begin
-i:=0;
-repeat
-    		i:=i+1;
-until (proyectos[i,1]=cp) or (i>=c_proyectos);
- 	if (proyectos[i,1]=cp)  then Bus_cod_proy := i
-        else Bus_cod_proy := 0;
+     seek(apy,0);
+     while not(eof(apy)) and (cp<>py.cod_proy) do
+           read(apy,py);
+     if filesize(apy)=0 then Bus_cod_proy:=0
+                        else if cp=py.cod_proy then Bus_cod_proy:=filepos(ae)
+                                               else Bus_cod_proy:=0;
 end;
 Procedure Mostrar_proyectos;{funcion auxiliar para mostrar proyectos}
-Var i:integer;
 BEGIN
      ClrScr;
+     seek(apy,0);
      Writeln('Proyectos:');
-     For i:= 1 to c_proyectos do
+     while not(eof(apy))do
      BEGIN
-          write(proyectos[i,1],'   ', proyectos[i,2], '  ', proyectos[i,3], '  ', proyectos[i,4], '  ', proyectos[i,5], '  ');
-          writeln(pcant[i]);
-     END;
+          read(apy,py);
+          write(py.cod_proy,'  ',py.cod_emp,'  ',py.cod_ciudad);
+     END
      Readln();
 END;
 Procedure Alta_proy; {ingreso de proyectos}
-Var opcion,i:Char;cod_ciudad:string[3];e:string;
+Var i:Char;aux:string[3];
 BEGIN
      ClrScr;
-     WRITELN('Presione 0 para dejar de ingresar proyectos');
-     READLN(opcion);
-     while (opcion<>'0') and (c_proyectos<>max_p) do
+     seek(apy,filesize(py));
+     repeat
+           WRITELN('Ingrese codigo de proyecto o 0 para salir');
+           READLN(aux);
+     until (aux='0') or (Bus_cod_proy(e)=0); {valida que el codigo de proyecto sea }
+     while (aux<>'0')  do
            begin
-           repeat
-                 WRITELN('Ingrese codigo de proyecto');
-                 READLN(e);
-           until Bus_cod_proy(e)=0; {valida que el codigo de proyecto sea }
-           c_proyectos:=c_proyectos+1;
-           proyectos[c_proyectos,1]:=e;
+           py.cod_proy:=aux;
            repeat
                  WRITELN('Ingrese el codigo de la empresa');
-                 READLN(e);
-           until Bus_cod_em(e)<>0; {valida que el codigo de empresa exista}
-           proyectos[c_proyectos,2]:=e;
+                 READLN(aux);
+           until Bus_cod_em(aux)<>0; {valida que el codigo de empresa exista}
+           py.cod_emp:=aux;
            repeat
                  WRITELN('Ingrese la etapa del proyecto');
                  READLN(i);
            until (i='P') or (i='O') or (i='T');{valida la etapa}
-           proyectos[c_proyectos,3]:= i;
+           py.etapa:= i;
            repeat
                  WRITELN('Ingrese el tipo de proyecto');
                  READLN(i);
            until (i='C') or (i='D') or (i='O') or (i='L');{valida el tipo}
-           proyectos[c_proyectos,4] := i;
+           py.tipo := i;
             repeat
                  WRITELN('Ingrese el codigo de la ciudad');
-                 READLN(cod_ciudad);
-           until Bus_cod_ciu(cod_ciudad)<>0; {valida que el codigo de ciudad exista}
-           proyectos[c_proyectos,5]:=cod_ciudad;
+                 READLN(aux);
+           until Bus_cod_ciu(aux)<>0; {valida que el codigo de ciudad exista}
+           py.cod_ciudad:=aux;
            WRITELN('Ingrese la cantidad de productos del proyecto');
-           READLN(pcant[c_proyectos]);
+           READLN(py.cant[1]);
            Mostrar_proyectos();{funcion auxiliar que muestras los proyectos}
            ClrScr;
-           WRITELN('Presione 0 para dejar de ingresar proyectos');
-           READLN(opcion);
+           repeat
+                 WRITELN('Ingrese codigo de proyecto o 0 para salir');
+                 READLN(aux);
+           until (aux='0') or (Bus_cod_proy(e)=0); {valida que el codigo de proyecto sea }
+     
            end;
-     if (max_p=c_proyectos) then
-                            Begin
-                                WRITELN('Maximo de proyectos alcanzado');
-                                Readln();
-                           End;
 END;
 {PARTE PRODUCTOS}
 Procedure Alta_prod;
@@ -417,7 +410,7 @@ REPEAT
               Writeln('Se encontro un proyecto del tipo deseado su codigo es: ',proyectos[i,1]);
               Mostrar_etapa(proyectos[i,3]);
               fila_em:=bus_cod_em(proyectos[i,2]); {te da la fila en la que se encontro el codigo de empresa en el array de empresas}
-               Writeln('El nombre de la empresa es: ',empresas[fila_em,2]);{dada la fila de dicho codigo te muestra el nombre correspondiente}
+               //Writeln('El nombre de la empresa es: ',empresas[fila_em,2]);{dada la fila de dicho codigo te muestra el nombre correspondiente}
                fila_ciu:=bus_cod_ciu(proyectos[i,5]);{te da la fila en la que se encontro el codigo de ciudad en el array de ciudaddes}
                //Writeln('El nombre de la ciudad es: ',ciudades[fila_ciu,2]); {dada la fila de dicho codigo te muestra el nombre correspondiente}
 
