@@ -5,11 +5,7 @@ Const
 {CLAVES}
 clave_em='hola123';
 clave_cli='soy cliente';
-
-{MAXIMOS ARRAYS}
-max_cli=3;
 TYPE
-cli=array[1..max_cli,1..2]of string[20];
 // tipos recod y file para ciudad
 ciudad = record
               cod_ciudad: string[3];
@@ -36,7 +32,14 @@ proyecto = record
                  tipo:string[1];
                  cant: array[1..3]of integer;
            end;
-proyectos = file ef proyecto;
+proyectos = file of proyecto;
+// tipos de datos para clientes
+cliente = record
+                dni:string[8];
+                nombre:string[25];
+                mail:string[25];
+          end;
+clientes= file of cliente;
 VAR
 {CREACION ARRAYS}
 // variavles para ciudad
@@ -48,29 +51,28 @@ ae:empresas;
 // variavles para proyecto
 py:proyecto;
 apy:proyectos;
-
-clientes:cli;
-{CONTADORES para saber donde esta el ultimmo elemento de cada array}
-c_clientes:integer;
+// variavles para clientes
+cli:cliente;
+acli:clientes;
+//opcion del menu
 opcion:char;
 
-Procedure Inicializar; {inicializa los contadores y el array cont_ciu en 0}
-Var i:integer;
+Procedure Inicializar; {asigna y abre archivos, tambien limpia contadores}
 BEGIN
      assign(aciu,'C:\TP3\CIUDADES.DAT');
      assign(ae,'C:\TP3\EMPRESAS-CONSTRUCTORAS.DAT');
+     assign(apy,'C:\TP3\PROYECTOS.DAT');
+     assign(acli,'C:\TP3\CLIENTES.DAT');
      {$I-} // abro archivos y si no existen los creo
            reset(aciu);
            if ioresult= 2 then rewrite (aciu);
            reset(ae);
            if ioresult= 2 then rewrite(ae);
+           reset(apy);
+           if ioresult= 2 then rewrite(apy);
+           reset(acli);
+           if ioresult= 2 then rewrite(acli);
      {$I+}
-     c_empresas:=0;
-     c_ciudades:=0;
-     c_proyectos:=0;
-     c_clientes:=0;
-     FOR i:= 1 to max_ciu DO cont_ciu[i]:=0;
-
 END;
 Function ingreso_clave(clave:string):boolean; {dado un strin que es la clave correcta te devuelve true si se ngresa correctamente, se tienen 3 intentos}
 Var c:char;
@@ -192,7 +194,7 @@ BEGIN
      while not(eof(ae))do
      BEGIN
           read(ae,e);
-          writeln(e.cod_emp,'  ',e.nombre,'  ',e.ciudad);
+          writeln(e.cod_emp,'  ',e.nombre,'  ',e.cod_ciudad);
      END;
      Readln();
 END;
@@ -276,18 +278,18 @@ BEGIN
      BEGIN
           read(apy,py);
           write(py.cod_proy,'  ',py.cod_emp,'  ',py.cod_ciudad);
-     END
+     END;
      Readln();
 END;
 Procedure Alta_proy; {ingreso de proyectos}
 Var i:Char;aux:string[3];
 BEGIN
      ClrScr;
-     seek(apy,filesize(py));
+     seek(apy,filesize(apy));
      repeat
            WRITELN('Ingrese codigo de proyecto o 0 para salir');
            READLN(aux);
-     until (aux='0') or (Bus_cod_proy(e)=0); {valida que el codigo de proyecto sea }
+     until (aux='0') or (Bus_cod_proy(aux)=0); {valida que el codigo de proyecto sea }
      while (aux<>'0')  do
            begin
            py.cod_proy:=aux;
@@ -318,7 +320,7 @@ BEGIN
            repeat
                  WRITELN('Ingrese codigo de proyecto o 0 para salir');
                  READLN(aux);
-           until (aux='0') or (Bus_cod_proy(e)=0); {valida que el codigo de proyecto sea }
+           until (aux='0') or (Bus_cod_proy(aux)=0); {valida que el codigo de proyecto sea }
      
            end;
 END;
@@ -348,38 +350,34 @@ END;
 
 {PARTE CLIENTES}
 Procedure Mostrar_clientes;{funcion auxiliar para mostrar clientes}
-Var i:integer;
 BEGIN
      ClrScr;
+     seek(acli,0);
      Writeln('Clientes:');
-     For i:= 1 to c_clientes do
-          writeln(clientes[i,1],'   ', clientes[i,2]);
+     while not(eof(acli))do
+     begin
+           read(acli,cli);
+           writeln(cli.dni,'  ',cli.nombre,'  ',cli.mail)
+     end;
      Readln();
 END;
 Procedure Alta_cliente;{ingreso de clientes}
-Var opcion:char;
 BEGIN
     ClrScr;
- 	Writeln('Ingrese 0 para dejar de ingresar clientes');
- Readln(opcion);
- 	While (opcion <> '0')and (max_cli<>c_clientes) do
+    seek(acli,filesize(acli));
+    writeln('Ingrese su DNI o = para salir');
+    readln(cli.dni);                           //validar DNI
+ 	While cli.dni <> '0' do
 		BEGIN
- 			 c_clientes:=c_clientes+1;
  		 	Writeln('Ingrese nombre y apellido: ');
-  			Readln(clientes[c_clientes,1]);
+  			Readln(cli.nombre);
   			Writeln('Ingrese mail: ');
-  			Readln(clientes[c_clientes,2]);
+  			Readln(cli.mail);
             Mostrar_clientes();{fincion auxiliar para mostrar clientes}
             ClrScr;
-  			Writeln('Ingrese 0 para dejar de ingresar clientes');
-  			Readln(opcion);
+            writeln('Ingrese su DNI o = para salir');
+            readln(cli.dni);                           //validar DNI
 		END;
- 	IF max_cli=c_clientes THEN
-                          Begin
-                                 Write('Maximo de clientes alcanzado');
-                                Readln();
-                           End;
-
 END;
 
 procedure Mostrar_etapa(etapa:string);{mustra segun la letra de la etapa la palabra correspondiente}
@@ -395,24 +393,30 @@ c:=etapa[1];{como el case no se puede hacer con un string, y etapa es un string 
 END;
 
 Procedure Consulta_proyectos;{dado un tipo de proyecto muestra los proyectos de ese tipo}
-var tipoproyecto:char;i,fila_em,fila_ciu:integer;
+var tipoproyecto:char;fila_em,fila_ciu:integer;
 BEGIN
-REPEAT
-    ClrScr;
- 	Write('Ingrese que tipo de proyecto desea conocer: ');
- 	Readln(tipoproyecto);
- 	UNTIL (tipoproyecto='C') OR (tipoproyecto='D') OR (tipoproyecto='O') OR (tipoproyecto='L');
- FOR i:=1 to (c_proyectos) do
+     seek(apy,0);
+     REPEAT
+           ClrScr;
+           Write('Ingrese que tipo de proyecto desea conocer: ');
+           Readln(tipoproyecto);
+     UNTIL (tipoproyecto='C') OR (tipoproyecto='D') OR (tipoproyecto='O') OR (tipoproyecto='L');
+     while not(eof(apy)) do
      BEGIN
-          IF (proyectos[i,4]) = (tipoproyecto)THEN
+          read(apy,py);
+          IF  py.tipo= (tipoproyecto)THEN
           BEGIN
 
-              Writeln('Se encontro un proyecto del tipo deseado su codigo es: ',proyectos[i,1]);
-              Mostrar_etapa(proyectos[i,3]);
-              fila_em:=bus_cod_em(proyectos[i,2]); {te da la fila en la que se encontro el codigo de empresa en el array de empresas}
-               //Writeln('El nombre de la empresa es: ',empresas[fila_em,2]);{dada la fila de dicho codigo te muestra el nombre correspondiente}
-               fila_ciu:=bus_cod_ciu(proyectos[i,5]);{te da la fila en la que se encontro el codigo de ciudad en el array de ciudaddes}
-               //Writeln('El nombre de la ciudad es: ',ciudades[fila_ciu,2]); {dada la fila de dicho codigo te muestra el nombre correspondiente}
+              Writeln('Se encontro un proyecto del tipo deseado su codigo es: ',py.cod_proy);
+              Mostrar_etapa(py.etapa);
+              fila_em:=bus_cod_em(py.cod_emp); {te da la fila en la que se encontro el codigo de empresa en el array de empresas}
+              seek(ae,fila_em-1);
+              read(ae,e);
+              Writeln('El nombre de la empresa es: ',e.nombre);{dada la fila de dicho codigo te muestra el nombre correspondiente}
+              fila_ciu:=bus_cod_ciu(py.cod_ciudad);{te da la fila en la que se encontro el codigo de ciudad en el array de ciudaddes}
+              seek(aciu,fila_ciu-1);
+              read(aciu,ciu);
+              Writeln('El nombre de la ciudad es: ',ciu.nombre); {dada la fila de dicho codigo te muestra el nombre correspondiente}
 
           END;
 
