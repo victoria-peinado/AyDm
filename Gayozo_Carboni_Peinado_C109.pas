@@ -277,7 +277,7 @@ BEGIN
      while not(eof(apy))do
      BEGIN
           read(apy,py);
-          write(py.cod_proy,'  ',py.cod_emp,'  ',py.cod_ciudad);
+          writeln(py.cod_proy,'  ',py.cod_emp,'  ',py.cod_ciudad);
      END;
      Readln();
 END;
@@ -315,6 +315,7 @@ BEGIN
            py.cod_ciudad:=aux;
            WRITELN('Ingrese la cantidad de productos del proyecto');
            READLN(py.cant[1]);
+           write(apy,py);
            Mostrar_proyectos();{funcion auxiliar que muestras los proyectos}
            ClrScr;
            repeat
@@ -373,6 +374,7 @@ BEGIN
   			Readln(cli.nombre);
   			Writeln('Ingrese mail: ');
   			Readln(cli.mail);
+            write(acli,cli);
             Mostrar_clientes();{fincion auxiliar para mostrar clientes}
             ClrScr;
             writeln('Ingrese su DNI o = para salir');
