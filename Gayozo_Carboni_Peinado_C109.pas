@@ -18,16 +18,33 @@ cli=array[1..max_cli,1..2]of string[20];
 proy=array[1..max_p,1..5]of string[10];
 proy_cant=array[1..max_p]of integer; {este tipo es para guardar la cantidad de productos de los proyectos}
 ciu_cont=array[1..max_ciu]of integer;{este tipo es para guardar la cantidad de empresas que hay en cada ciudad}
-ciudad= record                            // tipos recod y file para ciudad
+// tipos recod y file para ciudad
+ciudad = record
               cod_ciudad: string[3];
               nombre: string[25];
+              cant_e:integer;
         end;
 ciudades = file of ciudad;
+// tipos de datos para empresa
+empresa = record
+               cod_emp:string[3];
+               nombre:string[25];
+               mail:string[25];
+               direccion:string[25];
+               telefono:string[25];
+               cod_ciudad:string[3];
+         end;
+empresas = file of empresa;
+
 VAR
 {CREACION ARRAYS}
-ciu:ciudad; // variavles para ciudad
+// variavles para ciudad
+ciu:ciudad;
 aciu:ciudades;
-empresas:empr;
+//variables para empresa
+e:empresa;
+ae:empresas;
+
 
 clientes:cli;
 proyectos:proy;
@@ -41,9 +58,12 @@ Procedure Inicializar; {inicializa los contadores y el array cont_ciu en 0}
 Var i:integer;
 BEGIN
      assign(aciu,'C:\TP3\CIUDADES.DAT');
+     assign(ae,'C:\TP3\EMPRESAS-CONSTRUCTORAS.DAT');
      {$I-} // abro archivos y si no existen los creo
            reset(aciu);
            if ioresult= 2 then rewrite (aciu);
+           reset(ae);
+           if ioresult= 2 then rewrite(ae);
      {$I+}
      c_empresas:=0;
      c_ciudades:=0;
@@ -156,22 +176,26 @@ BEGIN
 END;
 {PARTE EMPRESAS}
 Function Bus_cod_em(ce:string):integer; {dado un codigo de empresa devuelve la "fila" en la que se encontro, o 0 si no se encontro.BUS SECUENCAL}
-Var i:integer;
 BEGIN
-      i:=0;
-      REPEAT
-            i:=i+1;
-      UNTIL (empresas[i,1]=ce) OR (i>=c_empresas);
-      IF (empresas[i,1]=ce) THEN Bus_cod_em:=i
-                            ELSE Bus_cod_em:=0;
+     seek(ae,0);
+     While not (eof(ae)) and (ce<>e.cod_emp) do
+           read(ae,e);
+
+     IF (filesize(ae)=0) THEN Bus_cod_em:=0
+                         ELSE IF ce=e.cod_emp THEN Bus_cod_em:=filepos(ae)+1
+                                              ELSE Bus_cod_em:=0;
 END;
 Procedure Mostrar_empresas;{funcion auxiliar para mostrar empresas}
-Var i:integer;
 BEGIN
      ClrScr;
-     Writeln('Empresas:');
-     For i:= 1 to c_empresas do
-          writeln(empresas[i,1],'   ', empresas[i,2], '  ', empresas[i,3], '  ', empresas[i,4], '  ', empresas[i,5], '  ', empresas[i,6]);
+     seek(ae,0);
+     Writeln('Listado Empresas');
+     while not(eof(ae))do
+     BEGIN
+          read(ae,e);
+          write(e.cod_emp,'  ',e.nombre);
+          writeln();
+     END;
      Readln();
 END;
 (*Procedure Ciudad_mas_empresas;{muestra las ciudades con mas cantidad de empresas}
@@ -196,46 +220,44 @@ end;
 end;*)
 
 Procedure Alta_empresas;{ingreso de empresas}
-Var opcion:char;
-    cod_ciudad:string[3];e:string;
+Var
+    cod_ciudad:string[3];ce:string[3];
 BEGIN
+     seek(ae,filesize(ae)); //puntero al final del archivo
      ClrScr;
-     Writeln('Presione 0 para dejar de ingresar empresas');
-     Readln(opcion);
-     While (opcion<>'0') AND (max_e<>c_empresas) DO
+     repeat
+           Writeln('Ingrese el codigo de la empresa o 0 para salir: ');
+           Readln(ce);
+     until (ce='0')or (Bus_cod_em(ce)=0);{valida que el codigo de empresa sea unico}
+     While (ce<>'0')DO
            BEGIN
-                repeat
-                      Writeln('Ingrese el codigo de la empresa: ');
-                      Readln(e);
-                until Bus_cod_em(e)=0;{valida que el codigo de empresa sea unico}
-                c_empresas:=c_empresas+1;
-                empresas[c_empresas,1]:=e;
+                e.cod_emp:=ce;
                 Writeln('Ingrese el nombre de la empresa: ');
-                Readln(empresas[c_empresas,2]);
+                Readln(e.nombre);
                 Writeln('Ingrese direccion de la empresa: ');
-                Readln(empresas[c_empresas,3]);
-                Writeln('Ingrese el mail de la empresa: ');
-                Readln(empresas[c_empresas,4]);
+                Readln(e.direccion);
+                Writeln('Ingrese el mail de la empresa: ');   //falta validar
+                Readln(e.mail);
                 Writeln('Ingrese el telefono de la empresa: ');
-                Readln(empresas[c_empresas,5]);
+                Readln(e.telefono);
                 repeat
                       Writeln('Ingrese el codigo de la ciudad: ');
                       Readln(cod_ciudad);
                 until Bus_cod_ciu(cod_ciudad)<>0; {valida que el codigo se ciudad sea uno existente}
-                empresas[c_empresas,6]:=cod_ciudad;
-                cont_ciu[Bus_cod_ciu(cod_ciudad)]:=cont_ciu[Bus_cod_ciu(cod_ciudad)]+1;{sumo 1 al contador de empresas de esa ciudad}
+                e.cod_ciudad:=cod_ciudad;
+                seek(aciu,Bus_cod_ciu(cod_ciudad)-1);//traigo la ciudad a memoria
+                read(aciu,ciu);
+                ciu.cant_e:=ciu.cant_e+1;
+                seek(aciu,Bus_cod_ciu(cod_ciudad)-1);
+                write(aciu,ciu);                     //guardo la ciudad con su registro editado
                 Mostrar_empresas();{funcion auxiliar para mostrar las empresa}
                 ClrScr;
-                Writeln('Presione 0 para dejar de ingresar empresas');
-                Readln(opcion);
+                repeat
+                      Writeln('Ingrese el codigo de la empresa o 0 para salir: ');
+                      Readln(ce);
+                until (ce='0')or (Bus_cod_em(ce)=0);{valida que el codigo de empresa sea unico}
            END;
-     IF (max_e=c_empresas) THEN
-                           Begin
-                                Writeln('Maximo de empresas alcanzado');
-                                Readln();
-                           End;
-     //Ciudad_mas_empresas();{llamada a funcion para mostrar las ciudades con mas empresas}
-     REadln();
+     Readln();
 END;
 {PARTE PROYECTOS}
 Function Bus_cod_proy(cp:string):integer; {dado un codigo de proyecto devuelve la "fila" en la que se encontro, o 0 si no se encontro.BUS SECUENCAL}
@@ -437,7 +459,10 @@ BEGIN {Programa principal}
                                        ELSE writeln('Clave incorrecta');
                 '2': IF Ingreso_clave(clave_cli)THEN Menu_clientes()
                                        ELSE writeln('Clave incorrecta');
-                '0':close(aciu);
+                '0':begin
+                         close(aciu);
+                         close(ae);
+                    end;
            END
      UNTIL (opcion='0');
 END.
