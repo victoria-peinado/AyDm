@@ -90,10 +90,10 @@ BEGIN
            BEGIN
                 if (c=#8) and (i>0) then Begin
                                    i:=i-1;
-                                   GotoXY(Wherex-1,Wherey);
-                                   Write(' ');
+                                    GotoXY(Wherex-1,Wherey);
+                                    Write(' ');
                                    intento_clave:=copy(intento_clave,1,i);
-                                   GotoXY(Wherex-1,Wherey);
+                                    GotoXY(Wherex-1,Wherey);
                               End
                          else if(c<>#8) then Begin
                               intento_clave:=intento_clave+c;{le agregamos a intento el caracter ingresado}
@@ -192,8 +192,6 @@ END;
 Function Bus_cod_em(ce:string):integer; {dado un codigo de empresa devuelve la "fila" en la que se encontro, o 0 si no se encontro.BUS SECUENCAL}
 BEGIN
      seek(ae,0);
-     if(not(eof(ae)))then
-     read(ae,e);
      While not (eof(ae)) and (ce<>e.cod_emp) do
            read(ae,e);
 
