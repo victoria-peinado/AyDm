@@ -28,8 +28,8 @@ proyecto = record
                  cod_proy:string[3];
                  cod_emp:string[3];
                  cod_ciudad:string[3];
-                 etapa:string[1];
-                 tipo:string[1];
+                 etapa:char;
+                 tipo:char;
                  cant: array[1..3]of integer;
            end;
 proyectos = file of proyecto;
@@ -125,10 +125,11 @@ BEGIN
      ClrScr;
      seek(aciu,0);
      Writeln('Ciudades ordenadas');
+     writeln('Codigo  Nombre');
      while not(eof(aciu))do
      BEGIN
           read(aciu,ciu);
-          writeln(ciu.cod_ciudad,'  ',ciu.nombre);
+          writeln(ciu.cod_ciudad,'     ',ciu.nombre);
      END;
      Readln();
 END;
@@ -191,6 +192,7 @@ BEGIN
      ClrScr;
      seek(ae,0);
      Writeln('Listado Empresas');
+     Writeln('Codigo Nombre Codigo_Ciudad');
      while not(eof(ae))do
      BEGIN
           read(ae,e);
@@ -274,10 +276,11 @@ BEGIN
      ClrScr;
      seek(apy,0);
      Writeln('Proyectos:');
+     writeln('Codigo  Tipo  Etapa  Cod_E  Cod_ciu Cant');
      while not(eof(apy))do
      BEGIN
           read(apy,py);
-          writeln(py.cod_proy,'  ',py.cod_emp,'  ',py.cod_ciudad);
+          writeln(py.cod_proy,'  ',py.tipo,'   ',py.etapa,'  ',py.cod_emp,'  ',py.cod_ciudad,'   ',py.cant[1]);
      END;
      Readln();
 END;
@@ -301,11 +304,13 @@ BEGIN
            repeat
                  WRITELN('Ingrese la etapa del proyecto');
                  READLN(i);
+                 i:=Upcase(i);
            until (i='P') or (i='O') or (i='T');{valida la etapa}
            py.etapa:= i;
            repeat
                  WRITELN('Ingrese el tipo de proyecto');
                  READLN(i);
+                 i:=Upcase(i);
            until (i='C') or (i='D') or (i='O') or (i='L');{valida el tipo}
            py.tipo := i;
             repeat
@@ -382,10 +387,8 @@ BEGIN
 		END;
 END;
 
-procedure Mostrar_etapa(etapa:string);{mustra segun la letra de la etapa la palabra correspondiente}
-Var c:char;
+procedure Mostrar_etapa(c:char);{mustra segun la letra de la etapa la palabra correspondiente}
 BEGIN
-c:=etapa[1];{como el case no se puede hacer con un string, y etapa es un string de una sola letra, se lo fuerza a ser char}
  Writeln('El estado de proyectos es: ');
  CASE c OF
       'P': Writeln('Preventa');
@@ -402,7 +405,8 @@ BEGIN
            ClrScr;
            Write('Ingrese que tipo de proyecto desea conocer: ');
            Readln(tipoproyecto);
-     UNTIL (tipoproyecto='C') OR (tipoproyecto='c') OR (tipoproyecto='D') OR (tipoproyecto='d')OR (tipoproyecto='O') OR (tipoproyecto='o') OR (tipoproyecto='L') OR (tipoproyecto='l');
+           tipoproyecto:=Upcase(tipoproyecto);
+     UNTIL (tipoproyecto='C')  OR (tipoproyecto='D') OR (tipoproyecto='O') OR (tipoproyecto='L') ;
      while not(eof(apy)) do
      BEGIN
           read(apy,py);
