@@ -246,10 +246,10 @@ BEGIN
                 until Bus_cod_ciu(aux)<>0; {valida que el codigo se ciudad sea uno existente}
                 e.cod_ciudad:=aux;
                 write(ae,e);                        //guardo todo en el archivo empresas
-                seek(aciu,Bus_cod_ciu(aux)-1);//traigo la ciudad a memoria
-                read(aciu,ciu);
+                //seek(aciu,Bus_cod_ciu(aux)-1);//traigo la ciudad a memoria
+                //read(aciu,ciu);
                 ciu.cant_e:=ciu.cant_e+1;
-                seek(aciu,Bus_cod_ciu(aux)-1);
+                seek(aciu,filepos(aciu)-1);
                 write(aciu,ciu);                     //guardo la ciudad con su registro editado
                 Mostrar_empresas();{funcion auxiliar para mostrar las empresa}
                 ClrScr;
