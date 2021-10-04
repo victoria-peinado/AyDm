@@ -3,7 +3,7 @@ program ordenarCadena(input,output);
 uses crt;
 Const
 {CLAVES}
-clave_em='hola123';
+clave_em='Hola123';
 clave_cli='soy cliente';
 TYPE
 // tipos recod y file para ciudad
@@ -42,7 +42,7 @@ cliente = record
 clientes= file of cliente;
 VAR
 {CREACION ARRAYS}
-// variavles para ciudad
+// variables para ciudad
 ciu:ciudad;
 aciu:ciudades;
 //variables para empresa
@@ -79,13 +79,13 @@ Var c:char;
     intento_clave:string;
     cont:integer;
 BEGIN
-     cont:=0;{contador de inteentos}
+     cont:=0;{contador de intentos}
      REPEAT
            ClrScr;
            intento_clave:=''; {inicializamos la clave como un string vacio}
            Write('Ingrese la clave: ');
            c:= readkey;
-           While c<>#13 do {mienentras que el caracter ingressado no sea enter}
+           While c<>#13 do {mientras que el caracter ingressado no sea enter}
            BEGIN
                 intento_clave:=intento_clave+c;{le agregamos a intento el caracter ingresado}
                 Write('*');
@@ -336,7 +336,7 @@ BEGIN
      REPEAT
            REPEAT
                  ClrScr;
-                 Writeln('Menu empresas desarrolladoras'#13#10'Ingrese su opcion: '#13#10'1- Alta ciudades'#13#10'2-Alta empresas '#13#10'3-Alta proyectos'#13#10'4- Alta productos'#13#10'0- volver menu principal');
+                 Writeln('Menu empresas desarrolladoras'#13#10'Ingrese su opcion: '#13#10'1- Alta ciudades'#13#10'2- Alta empresas '#13#10'3- Alta proyectos'#13#10'4- Alta productos'#13#10'0- volver menu principal');
                  Readln(opcion);
            UNTIL(opcion>='0')AND(opcion<='4'); {valido opcion}
            CASE opcion OF
@@ -402,7 +402,7 @@ BEGIN
            ClrScr;
            Write('Ingrese que tipo de proyecto desea conocer: ');
            Readln(tipoproyecto);
-     UNTIL (tipoproyecto='C') OR (tipoproyecto='D') OR (tipoproyecto='O') OR (tipoproyecto='L');
+     UNTIL (tipoproyecto='C') OR (tipoproyecto='c') OR (tipoproyecto='D') OR (tipoproyecto='d')OR (tipoproyecto='O') OR (tipoproyecto='o') OR (tipoproyecto='L') OR (tipoproyecto='l');
      while not(eof(apy)) do
      BEGIN
           read(apy,py);
@@ -446,18 +446,32 @@ BEGIN
 END;
 
 BEGIN {Programa principal}
+     TextBackGround (1);
+     TextColor (15);
      Inicializar();
      REPEAT
            REPEAT
                  ClrScr;
-                 writeln('Menu principal'#13#10'Ingrese:'#13#10'1-si es una empresa'+#13#10+'2-si es un cliente '+#13#10+'0-para salir');
+                 writeln('Menu principal'#13#10'Ingrese:'#13#10'1- Si es una empresa'+#13#10+'2- Si es un cliente '+#13#10+'0- Salir');
                  readln(opcion);
            UNTIL (opcion>='0')AND (opcion<='2');
            CASE opcion OF
                 '1': IF Ingreso_clave(clave_em)THEN Menu_empresas()
-                                       ELSE writeln('Clave incorrecta');
+                                       ELSE
+                                           BEGIN
+                                                 TextColor (12);
+                                                 writeln('Clave incorrecta');
+                                                 readln();
+                                                 TextColor (15);
+                                           END;
                 '2': IF Ingreso_clave(clave_cli)THEN Menu_clientes()
-                                       ELSE writeln('Clave incorrecta');
+                                       ELSE
+                                           BEGIN
+                                                TextColor (12);
+                                                writeln('Clave incorrecta');
+                                                readln();
+                                                TextColor (15);
+                                           END;
                 '0':begin
                          close(aciu);
                          close(ae);
