@@ -77,19 +77,31 @@ END;
 Function ingreso_clave(clave:string):boolean; {dado un strin que es la clave correcta te devuelve true si se ngresa correctamente, se tienen 3 intentos}
 Var c:char;
     intento_clave:string;
-    cont:integer;
+    cont,i:integer;
 BEGIN
      cont:=0;{contador de intentos}
      REPEAT
+           i:= 0;
            ClrScr;
            intento_clave:=''; {inicializamos la clave como un string vacio}
            Write('Ingrese la clave: ');
            c:= readkey;
            While c<>#13 do {mientras que el caracter ingressado no sea enter}
            BEGIN
-                intento_clave:=intento_clave+c;{le agregamos a intento el caracter ingresado}
-                Write('*');
-                c:=readkey
+                if (c=#8) and (i>0) then Begin
+                                   i:=i-1;
+                                    GotoXY(Wherex-1,Wherey);
+                                    Write(' ');
+                                   intento_clave:=copy(intento_clave,1,i);
+                                    GotoXY(Wherex-1,Wherey);
+                              End
+                         else if(c<>#8) then Begin
+                              intento_clave:=intento_clave+c;{le agregamos a intento el caracter ingresado}
+                              Write('*');
+                              i:=i+1;
+
+                              end;
+                 c:=readkey;
            END;
            Writeln;
            cont:=cont+1
@@ -280,7 +292,7 @@ BEGIN
      while not(eof(apy))do
      BEGIN
           read(apy,py);
-          writeln(py.cod_proy,'  ',py.tipo,'   ',py.etapa,'  ',py.cod_emp,'  ',py.cod_ciudad,'   ',py.cant[1]);
+          writeln(py.cod_proy,'       ',py.tipo,'   ',py.etapa,'  ',py.cod_emp,'  ',py.cod_ciudad,'   ',py.cant[1]);
      END;
      Readln();
 END;
