@@ -460,58 +460,61 @@ Function vali_proy(cp:string[3]):boolean; {dado un codigo de proyecto devuelve l
 Var c:integer;
 begin
      c:=0;
-     if(Bus_cod_proy(cp))<>0 then
-                              begin
-                                   // py.cant[1]= cant productos
-                                   if(filesize(apd)=0)and (py.cant[1]<> 0)
-                                                          then vali_proy:=true
-                                                          else if(py.cant[1]=0)then vali_proy:=false
-                                                                             else begin
-                                                                                       seek(apd,0);
-                                                                                       read(apd,pd);
-                                                                                       if (pd.cod_proy = cp)then c:=c+1;
-                                                                                       while not(eof) and (c<py.cant[1]) do
-                                                                                       begin
-                                                                                            read(apd,pd);
-                                                                                            if (pd.cod_proy = cp)then c:=c+1;
-                                                                                       end;
-                                                                                       if c<py.cant[1] then vali_proy:=true else vali_proy:=false;
-                                                                              end;
-                              end
+     if(Bus_cod_proy(cp))<>0
+         then
+             begin
+                  // py.cant[1]= cant productos
+                  if(filesize(apd)=0)and (py.cant[1]<> 0)
+                     then vali_proy:=true
+                     else if(py.cant[1]=0)then vali_proy:=false
+                                               else begin
+                                                         seek(apd,0);
+                                                         read(apd,pd);
+                                                         if (pd.cod_proy = cp)then c:=c+1; 
+
+                                                         while not(eof(apd)) and (c<py.cant[1]) do
+                                                               begin  
+                                                                      read(apd,pd);
+                                                                      if (pd.cod_proy = cp)then c:=c+1;
+                                                               end;
+                                                         if c<py.cant[1] then vali_proy:=true else vali_proy:=false;
+                                                    end;
+             end
                               else vali_proy:=false;
 end;
 Procedure Alta_prod; {ingreso de productos}
-Var i:string[8];aux:string[3];
+Var i:string[8];aux,aux1:string[3];
 BEGIN
      ClrScr;
      seek(apd,filesize(apd));
      repeat
            WRITELN('Ingrese codigo de producto o 0 para salir');
-           READLN(aux);
-     until (aux='0') or (Bus_cod_prod(aux)=0);
-     while (aux<>'0')  do
+           READLN(aux1);
+     until (aux1='0') or (Bus_cod_prod(aux1)=0);
+     while (aux1<>'0')  do
            begin
-           pd.cod_prod:=aux;
-           repeat
-                 WRITELN('Ingrese el codigo del proyecto');
-                 READLN(aux);
-           until (vali_proy(aux));
-           pd.cod_proy:=aux;
-           repeat
-                 WRITELN('Ingrese el precio');
-                 READLN(i);
-           until (validarnumero(i));{valida que sea un numero}
-           pd.precio:= i;
-           pd.estado:=false;
-           WRITELN('Ingrese la descripcion del producto');
-           READLN(pd.detalle);
-           write(apd,pd);
-           Mostrar_productos();{funcion auxiliar que muestras los productos}
-           ClrScr;
-           repeat
-                 WRITELN('Ingrese codigo de producto o 0 para salir');
-                 READLN(aux);
-           until (aux='0') or (Bus_cod_prod(aux)=0);
+
+                repeat
+                  pd.cod_prod:=aux1;    WRITELN('Ingrese el codigo del proyecto');
+                      READLN(aux);
+                until (vali_proy(aux));
+                pd.cod_prod:=aux1;
+                pd.cod_proy:=aux;
+                repeat
+                      WRITELN('Ingrese el precio');
+                      READLN(i);
+                until (validarnumero(i));{valida que sea un numero}
+                pd.precio:= i;
+                pd.estado:=false;
+                WRITELN('Ingrese la descripcion del producto');
+                READLN(pd.detalle);
+                write(apd,pd);
+                Mostrar_productos();{funcion auxiliar que muestras los productos}
+                ClrScr;
+                repeat
+                      WRITELN('Ingrese codigo de producto o 0 para salir');
+                      READLN(aux1);
+                until (aux1='0') or (Bus_cod_prod(aux1)=0);
            end;
 END;
 
