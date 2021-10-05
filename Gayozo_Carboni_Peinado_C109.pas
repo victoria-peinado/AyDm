@@ -486,7 +486,7 @@ Procedure Alta_prod; {ingreso de productos}
 Var i:string[8];aux,aux1:string[3];
 BEGIN
      ClrScr;
-     seek(apd,filesize(apd));
+
      repeat
            WRITELN('Ingrese codigo de producto o 0 para salir');
            READLN(aux1);
@@ -508,6 +508,7 @@ BEGIN
                 pd.estado:=false;
                 WRITELN('Ingrese la descripcion del producto');
                 READLN(pd.detalle);
+                seek(apd,filesize(apd));
                 write(apd,pd);
                 Mostrar_productos();{funcion auxiliar que muestras los productos}
                 ClrScr;
