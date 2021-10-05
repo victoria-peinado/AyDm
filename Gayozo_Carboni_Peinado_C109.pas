@@ -56,6 +56,10 @@ cli:cliente;
 acli:clientes;
 //opcion del menu
 opcion:char;
+//Variables validar dni
+doc:string[8];
+n1,error:integer;
+
 
 Procedure Inicializar; {asigna y abre archivos, tambien limpia contadores}
 BEGIN
@@ -188,6 +192,13 @@ BEGIN
           UNTIL (cod_ciudad='0')or(Bus_cod_ciu(cod_ciudad)=0); {valida que el codigo de ciudad sea unico}
      END;
 END;
+
+
+
+
+
+
+
 {PARTE EMPRESAS}
 Function Bus_cod_em(ce:string):integer; {dado un codigo de empresa devuelve la "fila" en la que se encontro, o 0 si no se encontro.BUS SECUENCAL}
 BEGIN
@@ -199,6 +210,29 @@ BEGIN
                          ELSE IF ce=e.cod_emp THEN Bus_cod_em:=filepos(ae)
                                               ELSE Bus_cod_em:=0;
 END;
+Function existe(dm:string):boolean;
+BEGIN
+     seek(acli,0);
+     While not (eof(acli)) and (dm<>cli.dni) do
+           read(acli,cli);
+
+     IF (filesize(acli)=0) THEN existe:=false
+                          ELSE IF dm=cli.dni THEN existe:=true
+                                        ELSE existe:=false;
+END;
+Function validarnumero (doc:string):boolean;
+Begin
+validarnumero:=false;
+VAL(doc,n1,error);
+                  If error<>0
+                     Then validarnumero:=false
+                     else validarnumero:=true;
+end;
+
+
+
+
+
 Procedure Mostrar_empresas;{funcion auxiliar para mostrar empresas}
 BEGIN
      ClrScr;
@@ -232,6 +266,13 @@ for i:=1 to c_ciudades do {muestra todas las ciudades que tiene la cantidad maxi
     					end;
 end;
 end;*)
+
+
+
+
+
+
+
 
 Procedure Alta_empresas;{ingreso de empresas}
 Var
@@ -273,6 +314,19 @@ BEGIN
                 until (aux='0')or (Bus_cod_em(aux)=0);{valida que el codigo de empresa sea unico}
            END;
 END;
+
+
+
+
+
+
+
+
+
+
+
+
+
 {PARTE PROYECTOS}
 Function Bus_cod_proy(cp:string):integer; {dado un codigo de proyecto devuelve la "fila" en la que se encontro, o 0 si no se encontro.BUS SECUENCAL}
 begin
@@ -383,21 +437,30 @@ Procedure Alta_cliente;{ingreso de clientes}
 BEGIN
     ClrScr;
     seek(acli,filesize(acli));
-    writeln('Ingrese su DNI o = para salir');
-    readln(cli.dni);                           //validar DNI
- 	While cli.dni <> '0' do
-		BEGIN
- 		 	Writeln('Ingrese nombre y apellido: ');
-  			Readln(cli.nombre);
-  			Writeln('Ingrese mail: ');
-  			Readln(cli.mail);
-            write(acli,cli);
-            Mostrar_clientes();{fincion auxiliar para mostrar clientes}
-            ClrScr;
-            writeln('Ingrese su DNI o = para salir');
-            readln(cli.dni);                           //validar DNI
-		END;
+    Repeat
+          writeln('Ingrese su DNI o "0" para salir:');// ingreso DNI y valido que sea numerico
+          readln(doc);
+          If not(validarnumero(doc))
+                                    Then Writeln('hay un error en la posicion ',error, ' de la cadena numerica');
+          If existe(doc)
+                                    Then Writeln('DNI ya existente');
+    Until (validarnumero(doc)) and not(existe(doc));
+    While (doc<>'0') do
+          BEGIN
+               Writeln('Ingrese nombre y apellido: ');
+               Readln(cli.nombre);
+               Writeln('Ingrese mail: ');
+               Readln(cli.mail);
+               write(acli,cli);
+               Mostrar_clientes();{fincion auxiliar para mostrar clientes}
+               ClrScr;
+               writeln('Ingrese su DNI o "0" para salir:');// ingreso DNI y valido que sea numerico
+               readln(doc);
+               cli.dni:= doc
+          end;
 END;
+
+
 
 procedure Mostrar_etapa(c:char);{mustra segun la letra de la etapa la palabra correspondiente}
 BEGIN
