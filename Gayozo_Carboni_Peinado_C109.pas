@@ -11,6 +11,7 @@ ciudad = record
               cod_ciudad: string[3];
               nombre: string[25];
               cant_e:integer;
+              cant_c:integer;
         end;
 ciudades = file of ciudad;
 // tipos de datos para empresa
@@ -21,6 +22,7 @@ empresa = record
                direccion:string[25];
                telefono:string[25];
                cod_ciudad:string[3];
+               cant:integer;
          end;
 empresas = file of empresa;
 //tipos de datos para proyectos
@@ -40,6 +42,15 @@ cliente = record
                 mail:string[25];
           end;
 clientes= file of cliente;
+//tipos de datos para productos
+producto = record
+                 cod_prod:string[3];
+                 cod_proy:string[3];
+                 precio:string[8];
+                 estado:boolean;
+                 detalle:string;
+           end;
+productos = file of producto;
 VAR
 {CREACION ARRAYS}
 // variables para ciudad
@@ -54,6 +65,9 @@ apy:proyectos;
 // variavles para clientes
 cli:cliente;
 acli:clientes;
+//variables para droductos
+pd:producto;
+apd:productos;
 //opcion del menu
 opcion:char;
 //Variables validar dni
@@ -67,6 +81,7 @@ BEGIN
      assign(ae,'C:\TP3\EMPRESAS-CONSTRUCTORAS.DAT');
      assign(apy,'C:\TP3\PROYECTOS.DAT');
      assign(acli,'C:\TP3\CLIENTES.DAT');
+     assign(apd,'C:\TP3\PRODUCTOS.DAT');
      {$I-} // abro archivos y si no existen los creo
            reset(aciu);
            if ioresult= 2 then rewrite (aciu);
@@ -76,6 +91,8 @@ BEGIN
            if ioresult= 2 then rewrite(apy);
            reset(acli);
            if ioresult= 2 then rewrite(acli);
+           reset(apd);
+           if ioresult= 2 then rewrite(apd);
      {$I+}
 END;
 Function ingreso_clave(clave:string):boolean; {dado un strin que es la clave correcta te devuelve true si se ngresa correctamente, se tienen 3 intentos}
@@ -149,7 +166,7 @@ BEGIN
      END;
      Readln();
 END;
-Function Bus_cod_ciu(cc: string):integer; {dado un codigo de ciudad devuelve la "fila" en la que se encontro, o 0 si no se encontro.BUS DICOTOMICA}
+Function Bus_cod_ciu(cc: string[3]):integer; {dado un codigo de ciudad devuelve la "fila" en la que se encontro, o 0 si no se encontro.BUS DICOTOMICA}
 Var q:boolean;
     comi,fin,medio:integer;
 BEGIN
@@ -182,6 +199,8 @@ BEGIN
           ciu.cod_ciudad:=cod_ciudad;
           Write('Ingrese el nombre de la ciudad: ');
           Readln(ciu.nombre);
+          ciu.cant_e:=0;
+          ciu.cant_c:=0;
           write(aciu,ciu);
           ordenar_ciudades();{despues de ingresar una nueva ciudad tengo que re ordenar el array}
           Mostrar_ciudades; {auxiliar muestra las ciudades ordenadas}
@@ -200,7 +219,7 @@ END;
 
 
 {PARTE EMPRESAS}
-Function Bus_cod_em(ce:string):integer; {dado un codigo de empresa devuelve la "fila" en la que se encontro, o 0 si no se encontro.BUS SECUENCAL}
+Function Bus_cod_em(ce:string[3]):integer; {dado un codigo de empresa devuelve la "fila" en la que se encontro, o 0 si no se encontro.BUS SECUENCAL}
 BEGIN
      IF (filesize(ae)=0) THEN Bus_cod_em:=0
      else Begin
@@ -302,6 +321,7 @@ BEGIN
                       Readln(aux);
                 until Bus_cod_ciu(aux)<>0; {valida que el codigo se ciudad sea uno existente}
                 e.cod_ciudad:=aux;
+                e.cant:=0;
                 write(ae,e);                        //guardo todo en el archivo empresas
                 //seek(aciu,Bus_cod_ciu(aux)-1);//traigo la ciudad a memoria
                 //read(aciu,ciu);
@@ -330,7 +350,7 @@ END;
 
 
 {PARTE PROYECTOS}
-Function Bus_cod_proy(cp:string):integer; {dado un codigo de proyecto devuelve la "fila" en la que se encontro, o 0 si no se encontro.BUS SECUENCAL}
+Function Bus_cod_proy(cp:string[3]):integer; {dado un codigo de proyecto devuelve la "fila" en la que se encontro, o 0 si no se encontro.BUS SECUENCAL}
 begin
      IF (filesize(apy)=0) THEN Bus_cod_proy:=0
      else Begin
@@ -356,7 +376,7 @@ BEGIN
      Readln();
 END;
 Procedure Alta_proy; {ingreso de proyectos}
-Var i:Char;aux:string[3];
+Var i:Char;aux:string[3];cantidades:string;error:integer;
 BEGIN
      ClrScr;
      seek(apy,filesize(apy));
@@ -389,8 +409,13 @@ BEGIN
                  READLN(aux);
            until Bus_cod_ciu(aux)<>0; {valida que el codigo de ciudad exista}
            py.cod_ciudad:=aux;
-           WRITELN('Ingrese la cantidad de productos del proyecto');
-           READLN(py.cant[1]);
+           repeat
+                 WRITELN('Ingrese la cantidad de productos del proyecto');
+                 READLN(cantidades);
+                 val(cantidades,py.cant[1],error);
+           until error=0;
+           py.cant[2]:=0;
+           py.cant[3]:=0;
            write(apy,py);
            Mostrar_proyectos();{funcion auxiliar que muestras los proyectos}
            ClrScr;
@@ -402,10 +427,94 @@ BEGIN
            end;
 END;
 {PARTE PRODUCTOS}
-Procedure Alta_prod;
+Function Bus_cod_prod(cp:string):integer; {dado un codigo de producto devuelve la "fila" en la que se encontro, o 0 si no se encontro.BUS SECUENCAL}
+begin
+     IF (filesize(apd)=0) THEN Bus_cod_prod:=0
+     else Begin
+               seek(apd,0);
+               read(apd,pd);
+               While not (eof(apd)) and (cp<>pd.cod_prod) do
+                     read(apd,pd);
+               IF cp=pd.cod_prod THEN Bus_cod_prod:=filepos(apd)
+                                              ELSE Bus_cod_prod:=0;
+          end
+end;
+Procedure Mostrar_productos;{funcion auxiliar para mostrar productos}
+Var aux:string[10];
 BEGIN
-     Writeln('En proceso');
+     ClrScr;
+     seek(apd,0);
+     Writeln('Productos:');
+     writeln('Codigo  Codigo_proy  Precio  Estado ');
+     while not(eof(apd))do
+     BEGIN
+          read(apd,pd);
+          if(pd.estado)
+                       then aux:='Vendido'
+                       else aux:='Disponible';
+          writeln(pd.cod_prod,'      ',pd.cod_proy,'       ',pd.precio,'   ',aux);
+     END;
+     Readln();
 END;
+Function vali_proy(cp:string[3]):boolean; {dado un codigo de proyecto devuelve la "fila" en la que se encontro, o 0 si no se encontro.BUS SECUENCAL}
+Var c:integer;
+begin
+     c:=0;
+     if(Bus_cod_proy(cp))<>0 then
+                              begin
+                                   // py.cant[1]= cant productos
+                                   if(filesize(apd)=0)and (py.cant[1]<> 0)
+                                                          then vali_proy:=true
+                                                          else if(py.cant[1]=0)then vali_proy:=false
+                                                                             else begin
+                                                                                       seek(apd,0);
+                                                                                       read(apd,pd);
+                                                                                       if (pd.cod_proy = cp)then c:=c+1;
+                                                                                       while not(eof) and (c<py.cant[1]) do
+                                                                                       begin
+                                                                                            read(apd,pd);
+                                                                                            if (pd.cod_proy = cp)then c:=c+1;
+                                                                                       end;
+                                                                                       if c<py.cant[1] then vali_proy:=true else vali_proy:=false;
+                                                                              end;
+                              end
+                              else vali_proy:=false;
+end;
+Procedure Alta_prod; {ingreso de productos}
+Var i:string[8];aux:string[3];
+BEGIN
+     ClrScr;
+     seek(apd,filesize(apd));
+     repeat
+           WRITELN('Ingrese codigo de producto o 0 para salir');
+           READLN(aux);
+     until (aux='0') or (Bus_cod_prod(aux)=0);
+     while (aux<>'0')  do
+           begin
+           pd.cod_prod:=aux;
+           repeat
+                 WRITELN('Ingrese el codigo del proyecto');
+                 READLN(aux);
+           until (vali_proy(aux));
+           pd.cod_proy:=aux;
+           repeat
+                 WRITELN('Ingrese el precio');
+                 READLN(i);
+           until (validarnumero(i));{valida que sea un numero}
+           pd.precio:= i;
+           pd.estado:=false;
+           WRITELN('Ingrese la descripcion del producto');
+           READLN(pd.detalle);
+           write(apd,pd);
+           Mostrar_productos();{funcion auxiliar que muestras los productos}
+           ClrScr;
+           repeat
+                 WRITELN('Ingrese codigo de producto o 0 para salir');
+                 READLN(aux);
+           until (aux='0') or (Bus_cod_prod(aux)=0);
+           end;
+END;
+
 Procedure Menu_empresas;
 Var opcion:char;
 BEGIN
@@ -503,7 +612,18 @@ BEGIN
               seek(aciu,fila_ciu-1);
               read(aciu,ciu);
               Writeln('El nombre de la ciudad es: ',ciu.nombre); {dada la fila de dicho codigo te muestra el nombre correspondiente}
-
+              //suma 1 a cant de consultas y lo graba
+              py.cant[2]:=py.cant[2]+1;
+              seek(apy,filepos(apy)-1);
+              write(apy,py);
+              //suma 1 cant de consultas empresa y lo graba
+              e.cant:=e.cant+1;
+              seek(ae,filepos(ae)-1);
+              write(ae,e);
+              //suma 1 cant de consultas ciudades y lo graba
+              ciu.cant_c:=ciu.cant_c+1;
+              seek(aciu,filepos(aciu)-1);
+              write(aciu,ciu);
           END;
 
     END;
@@ -559,6 +679,9 @@ BEGIN {Programa principal}
                 '0':begin
                          close(aciu);
                          close(ae);
+                         close(apy);
+                         close(acli);
+                         close(apd);
                     end;
            END
      UNTIL (opcion='0');
