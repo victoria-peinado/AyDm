@@ -202,13 +202,15 @@ END;
 {PARTE EMPRESAS}
 Function Bus_cod_em(ce:string):integer; {dado un codigo de empresa devuelve la "fila" en la que se encontro, o 0 si no se encontro.BUS SECUENCAL}
 BEGIN
-     seek(ae,0);
-     While not (eof(ae)) and (ce<>e.cod_emp) do
-           read(ae,e);
-
      IF (filesize(ae)=0) THEN Bus_cod_em:=0
-                         ELSE IF ce=e.cod_emp THEN Bus_cod_em:=filepos(ae)
+     else Begin
+               seek(ae,0);
+               read(ae,e);
+               While not (eof(ae)) and (ce<>e.cod_emp) do
+                     read(ae,e);
+               IF ce=e.cod_emp THEN Bus_cod_em:=filepos(ae)
                                               ELSE Bus_cod_em:=0;
+          end
 END;
 Function existe(dm:string):boolean;
 BEGIN
@@ -330,12 +332,15 @@ END;
 {PARTE PROYECTOS}
 Function Bus_cod_proy(cp:string):integer; {dado un codigo de proyecto devuelve la "fila" en la que se encontro, o 0 si no se encontro.BUS SECUENCAL}
 begin
-     seek(apy,0);
-     while not(eof(apy)) and (cp<>py.cod_proy) do
-           read(apy,py);
-     if filesize(apy)=0 then Bus_cod_proy:=0
-                        else if cp=py.cod_proy then Bus_cod_proy:=filepos(ae)
-                                               else Bus_cod_proy:=0;
+     IF (filesize(apy)=0) THEN Bus_cod_proy:=0
+     else Begin
+               seek(apy,0);
+               read(apy,py);
+               While not (eof(apy)) and (cp<>py.cod_proy) do
+                     read(apy,py);
+               IF cp=py.cod_proy THEN Bus_cod_proy:=filepos(apy)
+                                              ELSE Bus_cod_proy:=0;
+          end
 end;
 Procedure Mostrar_proyectos;{funcion auxiliar para mostrar proyectos}
 BEGIN
