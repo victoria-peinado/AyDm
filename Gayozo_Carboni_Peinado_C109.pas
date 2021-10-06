@@ -104,6 +104,8 @@ BEGIN
      REPEAT
            i:= 0;
            ClrScr;
+                TextBackGround (0);
+                TextColor (6);
            intento_clave:=''; {inicializamos la clave como un string vacio}
            Write('Ingrese la clave: ');
            c:= readkey;
@@ -156,6 +158,8 @@ END;
 Procedure Mostrar_ciudades;{funcion axiliar para ver que todo anduvo bien en el ordenamiento}
 BEGIN
      ClrScr;
+          TextBackGround (0);
+          TextColor (6);
      seek(aciu,0);
      Writeln('Ciudades ordenadas');
      writeln('Codigo  Nombre');
@@ -190,6 +194,8 @@ Var cod_ciudad:string[3];
 BEGIN
      seek(aciu,filesize(aciu));//puntero al final del archivo
      ClrScr;
+          TextBackGround (0);
+          TextColor (6);
      REPEAT
            Write('Ingrese el codigo de la ciudad: ');
            Readln(cod_ciudad);
@@ -205,6 +211,8 @@ BEGIN
           ordenar_ciudades();{despues de ingresar una nueva ciudad tengo que re ordenar el array}
           Mostrar_ciudades; {auxiliar muestra las ciudades ordenadas}
           ClrScr;
+               TextBackGround (0);
+               TextColor (6);
           REPEAT
                 Write('Ingrese el codigo de la ciudad: ');
                 Readln(cod_ciudad);
@@ -257,6 +265,8 @@ end;
 Procedure Mostrar_empresas;{funcion auxiliar para mostrar empresas}
 BEGIN
      ClrScr;
+          TextBackGround (0);
+          TextColor (6);
      seek(ae,0);
      Writeln('Listado Empresas');
      Writeln('Codigo Nombre Codigo_Ciudad');
@@ -301,6 +311,8 @@ Var
 BEGIN
      seek(ae,filesize(ae)); //puntero al final del archivo
      ClrScr;
+          TextBackGround (0);
+          TextColor (6);
      repeat
            Writeln('Ingrese el codigo de la empresa o 0 para salir: ');
            Readln(aux);
@@ -308,13 +320,21 @@ BEGIN
      While (aux<>'0')DO
            BEGIN
                 e.cod_emp:=aux;
-                Writeln('Ingrese el nombre de la empresa: ');
+                GotoXY(50, 8); WRITELN('--------------------------------');
+                GotoXY(50, 9);Writeln('Ingrese el nombre de la empresa: ');
+                GotoXY(50, 10); WRITELN('--------------------------------');
                 Readln(e.nombre);
-                Writeln('Ingrese direccion de la empresa: ');
+                GotoXY(50, 12); WRITELN('--------------------------------');
+                GotoXY(50, 13);Writeln('Ingrese direccion de la empresa: ');
+                GotoXY(50, 14); WRITELN('--------------------------------');
                 Readln(e.direccion);
-                Writeln('Ingrese el mail de la empresa: ');   //falta validar
+                GotoXY(50, 16); WRITELN('--------------------------------');
+                GotoXY(50, 17);Writeln('Ingrese el mail de la empresa: ');   //falta validar
+                GotoXY(50, 18); WRITELN('--------------------------------');
                 Readln(e.mail);
-                Writeln('Ingrese el telefono de la empresa: ');
+                GotoXY(50, 20); WRITELN('--------------------------------');
+                GotoXY(50, 21);Writeln('Ingrese el telefono de la empresa: ');
+                GotoXY(50, 22); WRITELN('--------------------------------');
                 Readln(e.telefono);
                 repeat
                       Writeln('Ingrese el codigo de la ciudad: ');
@@ -365,6 +385,8 @@ end;
 Procedure Mostrar_proyectos;{funcion auxiliar para mostrar proyectos}
 BEGIN
      ClrScr;
+          TextBackGround (0);
+          TextColor (6);
      seek(apy,0);
      Writeln('Proyectos:');
      writeln('Codigo  Tipo  Etapa  Cod_E  Cod_ciu Cant');
@@ -379,38 +401,50 @@ Procedure Alta_proy; {ingreso de proyectos}
 Var i:Char;aux:string[3];cantidades:string;error:integer;
 BEGIN
      ClrScr;
+          TextBackGround (0);
+          TextColor (6);
      seek(apy,filesize(apy));
      repeat
-           WRITELN('Ingrese codigo de proyecto o 0 para salir');
+           GotoXY(55, 7);WRITELN('Ingrese codigo de proyecto o 0 para salir');
            READLN(aux);
      until (aux='0') or (Bus_cod_proy(aux)=0); {valida que el codigo de proyecto sea }
      while (aux<>'0')  do
            begin
            py.cod_proy:=aux;
            repeat
-                 WRITELN('Ingrese el codigo de la empresa');
+                GotoXY(50, 9); WRITELN('--------------------------------');
+                GotoXY(50, 10); WRITELN('Ingrese el codigo de la empresa');
+                GotoXY(50, 11); WRITELN('--------------------------------');
                  READLN(aux);
            until Bus_cod_em(aux)<>0; {valida que el codigo de empresa exista}
            py.cod_emp:=aux;
            repeat
-                 WRITELN('Ingrese la etapa del proyecto');
+                 GotoXY(50, 9); WRITELN('--------------------------------');
+                 GotoXY(50, 10);WRITELN('Ingrese la etapa del proyecto');
+                 GotoXY(50, 11); WRITELN('--------------------------------');
                  READLN(i);
                  i:=Upcase(i);
            until (i='P') or (i='O') or (i='T');{valida la etapa}
            py.etapa:= i;
            repeat
-                 WRITELN('Ingrese el tipo de proyecto');
+                 GotoXY(50, 9); WRITELN('--------------------------------');
+                 GotoXY(50, 10);WRITELN('Ingrese el tipo de proyecto');
+                 GotoXY(50, 11); WRITELN('--------------------------------');
                  READLN(i);
                  i:=Upcase(i);
            until (i='C') or (i='D') or (i='O') or (i='L');{valida el tipo}
            py.tipo := i;
             repeat
-                 WRITELN('Ingrese el codigo de la ciudad');
+                 GotoXY(50, 9); WRITELN('--------------------------------');
+                 GotoXY(50, 10); WRITELN('Ingrese el codigo de la ciudad');
+                 GotoXY(50, 11); WRITELN('--------------------------------');
                  READLN(aux);
            until Bus_cod_ciu(aux)<>0; {valida que el codigo de ciudad exista}
            py.cod_ciudad:=aux;
            repeat
-                 WRITELN('Ingrese la cantidad de productos del proyecto');
+                 GotoXY(50, 9); WRITELN('--------------------------------');
+                 GotoXY(50, 10);WRITELN('Ingrese la cantidad de productos del proyecto');
+                 GotoXY(50, 11); WRITELN('--------------------------------');
                  READLN(cantidades);
                  val(cantidades,py.cant[1],error);
            until error=0;
@@ -443,6 +477,8 @@ Procedure Mostrar_productos;{funcion auxiliar para mostrar productos}
 Var aux:string[10];
 BEGIN
      ClrScr;
+     TextBackGround (0);
+     TextColor (6);
      seek(apd,0);
      Writeln('Productos:');
      writeln('Codigo  Codigo_proy  Precio  Estado ');
@@ -486,7 +522,8 @@ Procedure Alta_prod; {ingreso de productos}
 Var i:string[8];aux,aux1:string[3];
 BEGIN
      ClrScr;
-
+     TextBackGround (0);
+     TextColor (6);
      repeat
            WRITELN('Ingrese codigo de producto o 0 para salir');
            READLN(aux1);
@@ -525,6 +562,8 @@ BEGIN
      REPEAT
            REPEAT
                  ClrScr;
+                 TextBackGround (0);
+                 TextColor (6);
                  Writeln('Menu empresas desarrolladoras'#13#10'Ingrese su opcion: '#13#10'1- Alta ciudades'#13#10'2- Alta empresas '#13#10'3- Alta proyectos'#13#10'4- Alta productos'#13#10'0- volver menu principal');
                  Readln(opcion);
            UNTIL(opcion>='0')AND(opcion<='4'); {valido opcion}
@@ -542,6 +581,8 @@ END;
 Procedure Mostrar_clientes;{funcion auxiliar para mostrar clientes}
 BEGIN
      ClrScr;
+     TextBackGround (0);
+     TextColor (6);
      seek(acli,0);
      Writeln('Clientes:');
      while not(eof(acli))do
@@ -554,6 +595,8 @@ END;
 Procedure Alta_cliente;{ingreso de clientes}
 BEGIN
     ClrScr;
+     TextBackGround (0);
+     TextColor (6);
     seek(acli,filesize(acli));
     Repeat
           writeln('Ingrese su DNI o "0" para salir:');// ingreso DNI y valido que sea numerico
@@ -596,6 +639,8 @@ BEGIN
      seek(apy,0);
      REPEAT
            ClrScr;
+           TextBackGround (0);
+           TextColor (6);
            Write('Ingrese que tipo de proyecto desea conocer: ');
            Readln(tipoproyecto);
            tipoproyecto:=Upcase(tipoproyecto);
@@ -639,10 +684,15 @@ BEGIN
  REPEAT
 		REPEAT
                 ClrScr;
- 			    Writeln('Menu clientes');
- 			    Writeln('1. Alta de cliente');
-                Writeln('2. Consulta de proyectos');
-                Writeln('0. Volver al menu principal');
+                TextBackGround (0);
+                TextColor (6);
+ 			   GotoXY(55, 5); Writeln('MENU CLIENTES');
+               GotoXY(50, 6); Write('------------------------');
+ 			   GotoXY(50, 7); Writeln('1. Alta de cliente');
+               GotoXY(50, 8); Write('------------------------');
+               GotoXY(50, 9); Writeln('2. Consulta de proyectos');
+               GotoXY(50, 10); Write('------------------------');
+               GotoXY(50, 11); Writeln('0. Volver al menu principal');
                 Readln(opcion);
                 UNTIL (opcion >= '0')OR(opcion <= '2');
         CASE opcion OF
@@ -654,17 +704,46 @@ BEGIN
 END;
 
 BEGIN {Programa principal}
-     TextBackGround (1);
-     TextColor (15);
+     TextBackGround (0);
+     TextColor (6);
      Inicializar();
      REPEAT
            REPEAT
                  ClrScr;
-                 writeln('Menu principal'#13#10'Ingrese:'#13#10'1- Si es una empresa'+#13#10+'2- Si es un cliente '+#13#10+'0- Salir');
-                 readln(opcion);
+                 GotoXY(55, 7); write('MENU PRINCIPAL');
+                 GotoXY(50, 9); Write('------------------------');
+                 GotoXY(50, 10); Write('1- Empresa');
+                 GotoXY(50, 11); Write('------------------------');
+                 GotoXY(50, 12); Write('2- Clientes');
+                 GotoXY(50, 13); Write('------------------------');
+                 GotoXY(50, 14); Write('0- Salir');
+                 GotoXY(50, 15); Write('------------------------');
+                 GotoXY(50, 16); Write('Elija una opcion:');
+                 GotoXY(50, 17); Write('------------------------');
+
+                 GotoXY(60, 18);readln(opcion);
            UNTIL (opcion>='0')AND (opcion<='2');
+
+        DelLine;
+        GotoXY(50,30); Write('CARGANDO.../');
+        delay(350);
+        DelLine;
+        GotoXY(50,30); Write('CARGANDO...-');
+        delay(350);
+        DelLine;
+        GotoXY(50,30); Write('CARGANDO...\');
+        delay(350);
+        DelLine;
+        GotoXY(50,30); Write('CARGANDO...|');
+        delay(350);
+
+
+
+
+
            CASE opcion OF
                 '1': IF Ingreso_clave(clave_em)THEN Menu_empresas()
+
                                        ELSE
                                            BEGIN
                                                  TextColor (12);
