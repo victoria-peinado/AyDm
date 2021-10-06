@@ -592,49 +592,35 @@ BEGIN
      end;
      Readln();
 END;
-Procedure Alta_cliente;{ingreso de clientes}
-BEGIN
-    ClrScr;
-     TextBackGround (0);
-     TextColor (6);
-    seek(acli,filesize(acli));
-    Repeat
-          writeln('Ingrese su DNI o "0" para salir:');// ingreso DNI y valido que sea numerico
-          readln(doc);
-          If not(validarnumero(doc))
-                                    Then Writeln('hay un error en la posicion ',error, ' de la cadena numerica');
-          If existe(doc)
-                                    Then Writeln('DNI ya existente');
-    Until (validarnumero(doc)) and not(existe(doc));
-    While (doc<>'0') do
-          BEGIN
-               Writeln('Ingrese nombre y apellido: ');
-               Readln(cli.nombre);
-               Writeln('Ingrese mail: ');
-               Readln(cli.mail);
-               write(acli,cli);
-               Mostrar_clientes();{fincion auxiliar para mostrar clientes}
-               ClrScr;
-               writeln('Ingrese su DNI o "0" para salir:');// ingreso DNI y valido que sea numerico
-               readln(doc);
-               cli.dni:= doc
-          end;
-END;
-
-
-
 procedure Mostrar_etapa(c:char);{mustra segun la letra de la etapa la palabra correspondiente}
 BEGIN
- Writeln('El estado de proyectos es: ');
+ Write('La etapa de proyectos es: ');
  CASE c OF
       'P': Writeln('Preventa');
       'O': Writeln('Obras');
       'T': Writeln('Terminado');
- END
+ END;
 END;
+Procedure Mostrar_prod_proy(cp:string);
+begin
+     seek(apd,0);
+     ClrScr;
+     Writeln('PRODUCTOS del proyecto ', cp,' :');
+     while not(eof(apd))do
+     begin
+          read(apd,pd);
+          if(pd.cod_proy=cp)AND not(pd.estado)
+          then begin
+                    Writeln('Codigo del producto: ',pd.cod_prod);
+                    Writeln('Caracteristicas: ',pd.detalle);
+                    writeln('Precio: ',pd.precio);
+                    writeln();
+               end;
 
+     end;
+end;
 Procedure Consulta_proyectos;{dado un tipo de proyecto muestra los proyectos de ese tipo}
-var tipoproyecto:char;fila_em,fila_ciu:integer;
+var tipoproyecto:char;fila_em,fila_ciu:integer;aux:string[3];
 BEGIN
      seek(apy,0);
      REPEAT
@@ -661,22 +647,124 @@ BEGIN
               seek(aciu,fila_ciu-1);
               read(aciu,ciu);
               Writeln('El nombre de la ciudad es: ',ciu.nombre); {dada la fila de dicho codigo te muestra el nombre correspondiente}
-              //suma 1 a cant de consultas y lo graba
-              py.cant[2]:=py.cant[2]+1;
-              seek(apy,filepos(apy)-1);
-              write(apy,py);
-              //suma 1 cant de consultas empresa y lo graba
-              e.cant:=e.cant+1;
-              seek(ae,filepos(ae)-1);
-              write(ae,e);
-              //suma 1 cant de consultas ciudades y lo graba
-              ciu.cant_c:=ciu.cant_c+1;
-              seek(aciu,filepos(aciu)-1);
-              write(aciu,ciu);
+              writeln();
+
           END;
 
     END;
+    repeat
+    writeln('Ingrese el codigo del proyecto que desea consultar');
+    readln(aux);
+    until Bus_cod_proy(aux)<>0;
+    Mostrar_prod_proy(aux);
+    fila_em:=bus_cod_em(py.cod_emp); {te da la fila en la que se encontro el codigo de empresa en el array de empresas}
+    seek(ae,fila_em-1);
+    read(ae,e);
+    fila_ciu:=bus_cod_ciu(py.cod_ciudad);{te da la fila en la que se encontro el codigo de ciudad en el array de ciudaddes}
+    seek(aciu,fila_ciu-1);
+    read(aciu,ciu);
+
+    //suma 1 a cant de consultas y lo graba
+    py.cant[2]:=py.cant[2]+1;
+    seek(apy,filepos(apy)-1);
+    write(apy,py);
+    //suma 1 cant de consultas empresa y lo graba
+    e.cant:=e.cant+1;
+    seek(ae,filepos(ae)-1);
+    write(ae,e);
+    //suma 1 cant de consultas ciudades y lo graba
+    ciu.cant_c:=ciu.cant_c+1;
+    seek(aciu,filepos(aciu)-1);
+    write(aciu,ciu);
     Readln();
+END;
+Procedure Venta();
+var aux:string[3];opcion:char;
+Begin
+     repeat
+           writeln('Ingrese el codigo del producto a compar');
+           readln(aux);
+     until (Bus_cod_prod(aux)<>0) ;
+     if(pd.estado)then writeln('Ese producto ya se encuentra vendido')
+     else
+         begin
+              writeln('Detalle: ',pd.detalle);
+              writeln('Precio: ',pd.precio);
+              writeln();
+              writeln('Si desea confirmar la compra presione 1');
+              readln(opcion);
+              if opcion='1' then begin
+                                      Writeln('COMPRA CONFIRMADA.');
+                                      writeln('Le llegara al mail:  ',cli.mail);
+                                      readkey;
+                                      pd.estado:=true;
+                                      seek(apd,filepos(apd)-1);
+                                      write(apd,pd);
+                                 end;
+         end;
+End;
+Procedure Menu_clientes2();
+Var opcion:char;
+Begin
+ REPEAT
+		REPEAT
+                ClrScr;
+                TextBackGround (0);
+                TextColor (6);
+                GotoXY(55, 5); Writeln('Bienbenido ',cli.nombre,'  !!');
+                GotoXY(55,6); Writeln('Ingrese su opcion');
+                GotoXY(50, 7); Writeln('------------------------');
+                GotoXY(50,8); Writeln('a. Consulta de Proyecto');
+                GotoXY(50,9); Writeln('------------------------');
+                GotoXY(50,10); Writeln('b. Comprar Producto');
+                GotoXY(50,11); Writeln('------------------------');
+                GotoXY(50,12); Writeln('0. Volver al alta de clientes');
+                GotoXY(50,13);Readln(opcion);
+                opcion:=Upcase(opcion);
+                UNTIL (opcion = '0')OR(opcion >= 'A')OR(opcion <= 'B');
+        CASE opcion OF
+             'A': Consulta_proyectos();
+             'B': Venta();
+  			ELSE
+ 		END
+      UNTIL(opcion='0');
+end;
+Procedure Alta_cliente;{ingreso de clientes}
+BEGIN
+    ClrScr;
+     TextBackGround (0);
+     TextColor (6);
+    seek(acli,filesize(acli));
+    Repeat
+          writeln('Ingrese su DNI o "0" para salir:');// ingreso DNI y valido que sea numerico
+          readln(doc);
+          If not(validarnumero(doc))
+                                    Then Writeln('hay un error en la posicion ',error, ' de la cadena numerica');
+    Until (validarnumero(doc));
+
+    While (doc<>'0') do
+          BEGIN
+               If existe(doc)Then menu_clientes2()
+                  else
+                  begin
+                       cli.dni:= doc;
+                       Writeln('Ingrese nombre y apellido: ');
+                       Readln(cli.nombre);
+                       Writeln('Ingrese mail: ');
+                       Readln(cli.mail);
+                       write(acli,cli);
+                       Mostrar_clientes();{fincion auxiliar para mostrar clientes}
+                   end;
+                       ClrScr;
+                       Repeat
+                             writeln('Ingrese su DNI o "0" para salir:');// ingreso DNI y valido que sea numerico
+                             readln(doc);
+                             If not(validarnumero(doc))
+                                    Then Writeln('hay un error en la posicion ',error, ' de la cadena numerica');
+                       Until (validarnumero(doc));
+
+
+          end;
 END;
 Procedure Menu_clientes;
 Var opcion:char;
@@ -690,14 +778,11 @@ BEGIN
                GotoXY(50, 6); Write('------------------------');
  			   GotoXY(50, 7); Writeln('1. Alta de cliente');
                GotoXY(50, 8); Write('------------------------');
-               GotoXY(50, 9); Writeln('2. Consulta de proyectos');
-               GotoXY(50, 10); Write('------------------------');
-               GotoXY(50, 11); Writeln('0. Volver al menu principal');
+               GotoXY(50, 9); Writeln('0. Volver al menu principal');
                 Readln(opcion);
-                UNTIL (opcion >= '0')OR(opcion <= '2');
+                UNTIL (opcion >= '0')OR(opcion <= '1');
         CASE opcion OF
              '1': Alta_cliente();
-             '2': Consulta_proyectos();
   			ELSE
  		END
       UNTIL(opcion='0');
