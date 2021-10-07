@@ -4,7 +4,7 @@ uses crt;
 Const
 {CLAVES}
 clave_em='Hola123';
-clave_cli='soy cliente';
+clave_cli='Soy cliente';
 TYPE
 // tipos recod y file para ciudad
 ciudad = record
@@ -70,10 +70,7 @@ pd:producto;
 apd:productos;
 //opcion del menu
 opcion:char;
-//Variables validar dni
-doc:string[8];
 n1,error:integer;
-
 
 Procedure Inicializar; {asigna y abre archivos, tambien limpia contadores}
 BEGIN
@@ -239,15 +236,35 @@ BEGIN
                                               ELSE Bus_cod_em:=0;
           end
 END;
-Function existe(dm:string):boolean;
+Function existeme(me:string):boolean;
+BEGIN
+     seek(ae,0);
+     While not (eof(ae)) and (me<>e.mail) do
+           read(ae,e);
+
+     IF (filesize(ae)=0) THEN existeme:=false
+                          ELSE IF me=e.mail THEN existeme:=true
+                                        ELSE existeme:=false;
+END;
+Function existe(d:string):boolean;
 BEGIN
      seek(acli,0);
-     While not (eof(acli)) and (dm<>cli.dni) do
+     While not (eof(acli)) and (d<>cli.dni) do
            read(acli,cli);
 
      IF (filesize(acli)=0) THEN existe:=false
-                          ELSE IF dm=cli.dni THEN existe:=true
+                          ELSE IF d=cli.dni THEN existe:=true
                                         ELSE existe:=false;
+END;
+Function existemc(mc:string):boolean;
+BEGIN
+     seek(acli,0);
+     While not (eof(acli)) and (mc<>cli.mail) do
+           read(acli,cli);
+
+     IF (filesize(acli)=0) THEN existemc:=false
+                          ELSE IF mc=cli.mail THEN existemc:=true
+                                        ELSE existemc:=false;
 END;
 Function validarnumero (doc:string):boolean;
 Begin
@@ -308,6 +325,7 @@ end;*)
 Procedure Alta_empresas;{ingreso de empresas}
 Var
     aux:string[3];
+    mail:string;
 BEGIN
      seek(ae,filesize(ae)); //puntero al final del archivo
      ClrScr;
@@ -331,7 +349,12 @@ BEGIN
                 GotoXY(50, 16); WRITELN('--------------------------------');
                 GotoXY(50, 17);Writeln('Ingrese el mail de la empresa: ');   //falta validar
                 GotoXY(50, 18); WRITELN('--------------------------------');
-                Readln(e.mail);
+                Repeat
+                      Readln(mail);
+                      If (existeme(mail)=true)
+                                             Then Writeln('Ingrese un mail no registrado');
+                Until (existeme(mail)=false);
+                e.mail:=mail;
                 GotoXY(50, 20); WRITELN('--------------------------------');
                 GotoXY(50, 21);Writeln('Ingrese el telefono de la empresa: ');
                 GotoXY(50, 22); WRITELN('--------------------------------');
@@ -779,7 +802,10 @@ Begin
       UNTIL(opcion='0');
 end;
 Procedure Alta_cliente;{ingreso de clientes}
+Var mail:string;
+doc:string[8];
 BEGIN
+error:=error;
     ClrScr;
      TextBackGround (0);
      TextColor (6);
@@ -800,7 +826,12 @@ BEGIN
                        Writeln('Ingrese nombre y apellido: ');
                        Readln(cli.nombre);
                        Writeln('Ingrese mail: ');
-                       Readln(cli.mail);
+                       Repeat
+                             Readln(mail);
+                             If (existemc(mail)=true)
+                                                   Then Writeln('Ingrese un mail no registrado');
+                       Until (existemc(mail)=false);
+                       cli.mail:=mail;
                        write(acli,cli);
                        Mostrar_clientes();{fincion auxiliar para mostrar clientes}
                    end;
@@ -883,7 +914,7 @@ BEGIN {Programa principal}
                                                  TextColor (12);
                                                  writeln('Clave incorrecta');
                                                  readln();
-                                                 TextColor (15);
+                                                 TextColor (6);
                                            END;
                 '2': IF Ingreso_clave(clave_cli)THEN Menu_clientes()
                                        ELSE
@@ -891,7 +922,7 @@ BEGIN {Programa principal}
                                                 TextColor (12);
                                                 writeln('Clave incorrecta');
                                                 readln();
-                                                TextColor (15);
+                                                TextColor (6);
                                            END;
                 '0':begin
                          close(aciu);
