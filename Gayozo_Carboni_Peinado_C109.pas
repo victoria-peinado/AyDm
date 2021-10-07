@@ -513,10 +513,14 @@ begin
                                                                       read(apd,pd);
                                                                       if (pd.cod_proy = cp)then c:=c+1;
                                                                end;
-                                                         if c<py.cant[1] then vali_proy:=true else vali_proy:=false;
+                                                         if c<py.cant[1] then vali_proy:=true
+                                                            else begin
+                                                                      writeln('Este proyecto no tiene mas productos disponibles');
+                                                                      vali_proy:=false;
+                                                                  end;
                                                     end;
              end
-                              else vali_proy:=false;
+                              else begin writeln('No existe un proyecto con dicho codigo'); vali_proy:=false;end;
 end;
 Procedure Alta_prod; {ingreso de productos}
 Var i:string[8];aux,aux1:string[3];
@@ -555,7 +559,45 @@ BEGIN
                 until (aux1='0') or (Bus_cod_prod(aux1)=0);
            end;
 END;
+Procedure Estadisticas();
+Var aux:ciudad;
+begin ClrScr;
+     Writeln('Las empresas con consilas mayores a 10 fueron');
+     writeln('Codigo Nombre');
+     seek(ae,0);
+     while not(eof(ae))do
+           begin
+                read(ae,e);
+                if(e.cant>= 10)
+                   then Writeln(e.cod_emp,'      ',e.nombre);
+           end;
+     readkey;ClrScr;
+     Write('La ciudd con mas consultas es:  ');
+     if(filesize(aciu)=0)then writeln('No hay ninguna ciudad cargada')
+        else
+            begin
+                 seek(aciu,0);
+                 read(aciu,ciu);
+                 While not(eof(aciu))do
+                       begin
+                            read(aciu,aux);
+                            if(ciu.cant_c <aux.cant_c)then ciu:=aux;
+                       end;
+                 Writeln(ciu.nombre,'(',ciu.cod_ciudad,')');
+            end;
+     readkey;ClrScr;
+     Writeln('Los proyectos que vendieron todos los productos son: ');
+     writeln('Codigo Cant_productos');
+     seek(apy,0);
+     while not(eof(apy))do
+           begin
+                read(apy,py);
+                if(py.cant[1]=py.cant[3])then
+                writeln(py.cod_proy,'       ',py.cant[1]);
+           end;
 
+     readkey;ClrScr;
+end;
 Procedure Menu_empresas;
 Var opcion:char;
 BEGIN
@@ -564,14 +606,15 @@ BEGIN
                  ClrScr;
                  TextBackGround (0);
                  TextColor (6);
-                 Writeln('Menu empresas desarrolladoras'#13#10'Ingrese su opcion: '#13#10'1- Alta ciudades'#13#10'2- Alta empresas '#13#10'3- Alta proyectos'#13#10'4- Alta productos'#13#10'0- volver menu principal');
+                 Writeln('Menu empresas desarrolladoras'#13#10'Ingrese su opcion: '#13#10'1- Alta ciudades'#13#10'2- Alta empresas '#13#10'3- Alta proyectos'#13#10'4- Alta productos'#13#10'5- Estadisticas '#13#10'0- volver menu principal');
                  Readln(opcion);
-           UNTIL(opcion>='0')AND(opcion<='4'); {valido opcion}
+           UNTIL(opcion>='0')AND(opcion<='5'); {valido opcion}
            CASE opcion OF
                 '1': Alta_ciudades();
                 '2': Alta_empresas();
                 '3': ALta_proy();
                 '4': ALTA_prod();
+                '5': Estadisticas();
                 ELSE
            END
      UNTIL(opcion ='0');
@@ -700,6 +743,12 @@ Begin
                                       pd.estado:=true;
                                       seek(apd,filepos(apd)-1);
                                       write(apd,pd);
+                                      if (Bus_cod_proy(pd.cod_proy)<>0)
+                                         then begin
+                                                   py.cant[3]:=py.cant[3]+1;
+                                                   seek(apy,filepos(apy)-1);
+                                                   write(apy,py);
+                                              end;
                                  end;
          end;
 End;
