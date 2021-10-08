@@ -239,35 +239,42 @@ END;
 Function existeme(me:string):boolean;
 var aux:empresa;
 BEGIN
-     seek(ae,0);
-     While not (eof(ae)) and (me<>aux.mail) do
-           read(ae,aux);
-
      IF (filesize(ae)=0) THEN existeme:=false
-                          ELSE IF me=aux.mail THEN existeme:=true
-                                        ELSE existeme:=false;
+     else Begin
+                seek(ae,0);
+                read(ae,aux);
+                While not (eof(ae)) and (me<>aux.mail) do
+                      read(ae,aux);
+                IF me=aux.mail THEN existeme:=true
+                          ELSE existeme:=false;
+          end;
+
 END;
 Function existe(d:string):boolean;
 var aux:cliente;
 BEGIN
-     seek(acli,0);
-     While not (eof(acli)) and (d<>aux.dni) do
-           read(acli,aux);
-
-     IF (filesize(acli)=0) THEN existe:=false
-                          ELSE IF d=aux.dni THEN existe:=true
-                                        ELSE existe:=false;
+     IF (filesize(acli)=0) THEN existe:=false else
+     begin
+          seek(acli,0);
+          read(acli,aux);
+          While not (eof(acli)) and (d<>aux.dni) do
+                 read(acli,aux);
+          IF d=aux.dni THEN existe:=true
+                       ELSE existe:=false;
+    end
 END;
 Function existemc(mc:string):boolean;
 var aux:cliente;
 BEGIN
-     seek(acli,0);
-     While not (eof(acli)) and (mc<>aux.mail) do
-           read(acli,aux);
-
-     IF (filesize(acli)=0) THEN existemc:=false
-                          ELSE IF mc=aux.mail THEN existemc:=true
-                                        ELSE existemc:=false;
+     IF (filesize(acli)=0) THEN existemc:=false else
+     begin
+          seek(acli,0);
+          read(acli,aux);
+          While not (eof(acli)) and (mc<>aux.mail) do
+                read(acli,aux);
+          IF mc=aux.mail THEN existemc:=true
+                         ELSE existemc:=false;
+     end
 END;
 Function validarnumero (doc:string):boolean;
 Begin
