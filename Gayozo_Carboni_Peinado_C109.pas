@@ -237,33 +237,36 @@ BEGIN
           end
 END;
 Function existeme(me:string):boolean;
+var aux:empresa;
 BEGIN
      seek(ae,0);
-     While not (eof(ae)) and (me<>e.mail) do
-           read(ae,e);
+     While not (eof(ae)) and (me<>aux.mail) do
+           read(ae,aux);
 
      IF (filesize(ae)=0) THEN existeme:=false
-                          ELSE IF me=e.mail THEN existeme:=true
+                          ELSE IF me=aux.mail THEN existeme:=true
                                         ELSE existeme:=false;
 END;
 Function existe(d:string):boolean;
+var aux:cliente;
 BEGIN
      seek(acli,0);
-     While not (eof(acli)) and (d<>cli.dni) do
-           read(acli,cli);
+     While not (eof(acli)) and (d<>aux.dni) do
+           read(acli,aux);
 
      IF (filesize(acli)=0) THEN existe:=false
-                          ELSE IF d=cli.dni THEN existe:=true
+                          ELSE IF d=aux.dni THEN existe:=true
                                         ELSE existe:=false;
 END;
 Function existemc(mc:string):boolean;
+var aux:cliente;
 BEGIN
      seek(acli,0);
-     While not (eof(acli)) and (mc<>cli.mail) do
-           read(acli,cli);
+     While not (eof(acli)) and (mc<>aux.mail) do
+           read(acli,aux);
 
      IF (filesize(acli)=0) THEN existemc:=false
-                          ELSE IF mc=cli.mail THEN existemc:=true
+                          ELSE IF mc=aux.mail THEN existemc:=true
                                         ELSE existemc:=false;
 END;
 Function validarnumero (doc:string):boolean;
@@ -327,7 +330,7 @@ Var
     aux:string[3];
     mail:string;
 BEGIN
-     seek(ae,filesize(ae)); //puntero al final del archivo
+
      ClrScr;
           TextBackGround (0);
           TextColor (6);
@@ -365,6 +368,7 @@ BEGIN
                 until Bus_cod_ciu(aux)<>0; {valida que el codigo se ciudad sea uno existente}
                 e.cod_ciudad:=aux;
                 e.cant:=0;
+                seek(ae,filesize(ae)); //puntero al final del archivo
                 write(ae,e);                        //guardo todo en el archivo empresas
                 //seek(aciu,Bus_cod_ciu(aux)-1);//traigo la ciudad a memoria
                 //read(aciu,ciu);
@@ -809,7 +813,7 @@ error:=error;
     ClrScr;
      TextBackGround (0);
      TextColor (6);
-    seek(acli,filesize(acli));
+
     Repeat
           writeln('Ingrese su DNI o "0" para salir:');// ingreso DNI y valido que sea numerico
           readln(doc);
@@ -832,6 +836,7 @@ error:=error;
                                                    Then Writeln('Ingrese un mail no registrado');
                        Until (existemc(mail)=false);
                        cli.mail:=mail;
+                       seek(acli,filesize(acli));
                        write(acli,cli);
                        Mostrar_clientes();{fincion auxiliar para mostrar clientes}
                    end;
