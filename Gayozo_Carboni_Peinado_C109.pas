@@ -194,7 +194,7 @@ BEGIN
           TextBackGround (0);
           TextColor (6);
      REPEAT
-           Write('Ingrese el codigo de la ciudad: ');
+           Write('Ingrese el codigo de la ciudad o 0 para salir: ');
            Readln(cod_ciudad);
      UNTIL (cod_ciudad='0')or(Bus_cod_ciu(cod_ciudad)=0); {valida que el codigo de ciudad sea unico}
      While (cod_ciudad <>'0') do
@@ -250,41 +250,6 @@ BEGIN
           end;
 
 END;
-Function existe(d:string):boolean;
-var aux:cliente;
-BEGIN
-     IF (filesize(acli)=0) THEN existe:=false else
-     begin
-          seek(acli,0);
-          read(acli,aux);
-          While not (eof(acli)) and (d<>aux.dni) do
-                 read(acli,aux);
-          IF d=aux.dni THEN existe:=true
-                       ELSE existe:=false;
-    end
-END;
-Function existemc(mc:string):boolean;
-var aux:cliente;
-BEGIN
-     IF (filesize(acli)=0) THEN existemc:=false else
-     begin
-          seek(acli,0);
-          read(acli,aux);
-          While not (eof(acli)) and (mc<>aux.mail) do
-                read(acli,aux);
-          IF mc=aux.mail THEN existemc:=true
-                         ELSE existemc:=false;
-     end
-END;
-Function validarnumero (doc:string):boolean;
-Begin
-validarnumero:=false;
-VAL(doc,n1,error);
-                  If error<>0
-                     Then validarnumero:=false
-                     else validarnumero:=true;
-end;
-
 
 
 
@@ -557,7 +522,7 @@ begin
                               else begin writeln('No existe un proyecto con dicho codigo'); vali_proy:=false;end;
 end;
 Procedure Alta_prod; {ingreso de productos}
-Var i:string[8];aux,aux1:string[3];
+Var i:string[8];aux,aux1:string[3];num:integer;
 BEGIN
      ClrScr;
      TextBackGround (0);
@@ -578,7 +543,8 @@ BEGIN
                 repeat
                       WRITELN('Ingrese el precio');
                       READLN(i);
-                until (validarnumero(i));{valida que sea un numero}
+                      val(i,num,error);
+                until error=0;{valida que sea un numero}
                 pd.precio:= i;
                 pd.estado:=false;
                 WRITELN('Ingrese la descripcion del producto');
@@ -594,9 +560,9 @@ BEGIN
            end;
 END;
 Procedure Estadisticas();
-Var aux:ciudad;
+Var aux:integer;
 begin ClrScr;
-     Writeln('Las empresas con consilas mayores a 10 fueron');
+     Writeln('Las empresas con consultas mayores a 10 fueron');
      writeln('Codigo Nombre');
      seek(ae,0);
      while not(eof(ae))do
@@ -606,18 +572,25 @@ begin ClrScr;
                    then Writeln(e.cod_emp,'      ',e.nombre);
            end;
      readkey;ClrScr;
-     Write('La ciudd con mas consultas es:  ');
+     Writeln('La ciudad/es con mas consultas es/son:  ');
      if(filesize(aciu)=0)then writeln('No hay ninguna ciudad cargada')
         else
             begin
                  seek(aciu,0);
                  read(aciu,ciu);
+                 aux:=ciu.cant_c;
                  While not(eof(aciu))do
                        begin
-                            read(aciu,aux);
-                            if(ciu.cant_c <aux.cant_c)then ciu:=aux;
+                            read(aciu,ciu);
+                            if(ciu.cant_c > aux)then aux:=ciu.cant_c;
                        end;
-                 Writeln(ciu.nombre,'(',ciu.cod_ciudad,')');
+                 seek(aciu,0);
+                 While not(eof(aciu))do
+                       Begin
+                            read(aciu,ciu);
+                            if(ciu.cant_c=aux) then Writeln(ciu.nombre,'(',ciu.cod_ciudad,')');
+                       end;
+                writeln('La cantidad de consultas es :',aux);
             end;
      readkey;ClrScr;
      Writeln('Los proyectos que vendieron todos los productos son: ');
@@ -655,6 +628,40 @@ BEGIN
 END;
 
 {PARTE CLIENTES}
+Function existe(d:string):boolean; //funcion que se fija si existe un cliente daddo un dni
+BEGIN
+     IF (filesize(acli)=0) THEN existe:=false else
+     begin
+          seek(acli,0);
+          read(acli,cli);
+          While not (eof(acli)) and (d<>cli.dni) do
+                 read(acli,cli);
+          IF d=cli.dni THEN existe:=true
+                       ELSE existe:=false;
+    end
+END;
+Function existemc(mc:string):boolean; //funcion que se fija se ya existe un cliente con el dni
+var aux:cliente;
+BEGIN
+     IF (filesize(acli)=0) THEN existemc:=false else
+     begin
+          seek(acli,0);
+          read(acli,aux);
+          While not (eof(acli)) and (mc<>aux.mail) do
+                read(acli,aux);
+          IF mc=aux.mail THEN existemc:=true
+                         ELSE existemc:=false;
+     end
+END;
+Function validarnumero (doc:string):boolean;//valida que un numero sea un entero
+Begin
+validarnumero:=false;
+VAL(doc,n1,error);
+                  If error<>0
+                     Then validarnumero:=false
+                     else validarnumero:=true;
+end;
+
 Procedure Mostrar_clientes;{funcion auxiliar para mostrar clientes}
 BEGIN
      ClrScr;
@@ -730,9 +737,11 @@ BEGIN
 
     END;
     repeat
-    writeln('Ingrese el codigo del proyecto que desea consultar');
+    writeln('Ingrese el codigo del proyecto que desea consultar o 0 para salir');
     readln(aux);
-    until Bus_cod_proy(aux)<>0;
+    until (Bus_cod_proy(aux)<>0) or (aux='0') ;
+    if (aux<>'0') then
+    begin
     Mostrar_prod_proy(aux);
     fila_em:=bus_cod_em(py.cod_emp); {te da la fila en la que se encontro el codigo de empresa en el array de empresas}
     seek(ae,fila_em-1);
@@ -754,14 +763,17 @@ BEGIN
     seek(aciu,filepos(aciu)-1);
     write(aciu,ciu);
     Readln();
+    end;
 END;
 Procedure Venta();
 var aux:string[3];opcion:char;
 Begin
      repeat
-           writeln('Ingrese el codigo del producto a compar');
+           writeln('Ingrese el codigo del producto a compar o 0 para salir');
            readln(aux);
-     until (Bus_cod_prod(aux)<>0) ;
+     until (Bus_cod_prod(aux)<>0) or (aux='0');
+     if (aux<>'0')then
+     begin
      if(pd.estado)then writeln('Ese producto ya se encuentra vendido')
      else
          begin
@@ -785,6 +797,7 @@ Begin
                                               end;
                                  end;
          end;
+     end;
 End;
 Procedure Menu_clientes2();
 Var opcion:char;
