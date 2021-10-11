@@ -201,7 +201,11 @@ BEGIN
            GotoXY(40, 5); WRITELN('----------------------------------------------------');
            GotoXY(40, 6); Write('Ingrese el codigo de la ciudad o 0 para salir: ');
            GotoXY(40, 7); WRITELN('----------------------------------------------------');
+<<<<<<< HEAD
            GotoXY(86, 6);Readln(cod_ciudad);
+=======
+           GotoXY(96, 6);Readln(cod_ciudad);
+>>>>>>> 7bde0405797e8f196ae93482494ada917a8b486a
      UNTIL (cod_ciudad='0')or(Bus_cod_ciu(cod_ciudad)=0); {valida que el codigo de ciudad sea unico}
      While (cod_ciudad <>'0') do
      BEGIN
@@ -209,7 +213,11 @@ BEGIN
           GotoXY(40, 8); WRITELN('----------------------------------------------------');
           GotoXY(40, 9); Write('Ingrese el nombre de la ciudad: ');
           GotoXY(40, 10); WRITELN('----------------------------------------------------');
+<<<<<<< HEAD
           GotoXY(71, 9);Readln(ciu.nombre);
+=======
+          GotoXY(78, 9);Readln(ciu.nombre);
+>>>>>>> 7bde0405797e8f196ae93482494ada917a8b486a
           ciu.cant_e:=0;
           ciu.cant_c:=0;
           write(aciu,ciu);
@@ -369,11 +377,18 @@ BEGIN
                 Mostrar_empresas();{funcion auxiliar para mostrar las empresa}
                 ClrScr;
                 repeat
+<<<<<<< HEAD
                       ClrScr;
                       GotoXY(40, 5); WRITELN('----------------------------------------------------');
                       GotoXY(40, 6);   Writeln('Ingrese el codigo de la empresa o 0 para salir: ');
                       GotoXY(40, 7); WRITELN('----------------------------------------------------');
                       GotoXY(87, 6);   Readln(aux);
+=======
+                   GotoXY(40, 23); WRITELN('----------------------------------------------------');
+                   GotoXY(40, 24);   Writeln('Ingrese el codigo de la empresa o 0 para salir: ');
+                   GotoXY(40, 25); WRITELN('----------------------------------------------------');
+                   GotoXY(95, 24);   Readln(aux);
+>>>>>>> 7bde0405797e8f196ae93482494ada917a8b486a
                 until (aux='0')or (Bus_cod_em(aux)=0);{valida que el codigo de empresa sea unico}
            END;
 END;
