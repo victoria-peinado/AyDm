@@ -204,7 +204,7 @@ BEGIN
            GotoXY(40, 5); WRITELN('----------------------------------------------------');
            GotoXY(40, 6); Write('Ingrese el codigo de la ciudad o 0 para salir: ');
            GotoXY(40, 7); WRITELN('----------------------------------------------------');
-           GotoXY(90, 6);Readln(cod_ciudad);
+           GotoXY(96, 6);Readln(cod_ciudad);
      UNTIL (cod_ciudad='0')or(Bus_cod_ciu(cod_ciudad)=0); {valida que el codigo de ciudad sea unico}
      While (cod_ciudad <>'0') do
      BEGIN
@@ -212,7 +212,7 @@ BEGIN
           GotoXY(40, 8); WRITELN('----------------------------------------------------');
           GotoXY(40, 9); Write('Ingrese el nombre de la ciudad: ');
           GotoXY(40, 10); WRITELN('----------------------------------------------------');
-          GotoXY(72, 9);Readln(ciu.nombre);
+          GotoXY(78, 9);Readln(ciu.nombre);
           ciu.cant_e:=0;
           ciu.cant_c:=0;
           write(aciu,ciu);
@@ -374,7 +374,7 @@ BEGIN
                    GotoXY(40, 23); WRITELN('----------------------------------------------------');
                    GotoXY(40, 24);   Writeln('Ingrese el codigo de la empresa o 0 para salir: ');
                    GotoXY(40, 25); WRITELN('----------------------------------------------------');
-                   GotoXY(750, 24);   Readln(aux);
+                   GotoXY(95, 24);   Readln(aux);
                 until (aux='0')or (Bus_cod_em(aux)=0);{valida que el codigo de empresa sea unico}
            END;
 END;
