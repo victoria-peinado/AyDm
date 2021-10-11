@@ -104,8 +104,10 @@ BEGIN
                 TextBackGround (0);
                 TextColor (6);
            intento_clave:=''; {inicializamos la clave como un string vacio}
-           Write('Ingrese la clave: ');
-           c:= readkey;
+           GotoXY(40, 4); WRITELN('----------------------------------------------------');
+           GotoXY(40, 5);Write('Ingrese la clave: ');
+           GotoXY(40, 6); WRITELN('----------------------------------------------------');
+           GotoXY(70, 5);c:= readkey;
            While c<>#13 do {mientras que el caracter ingressado no sea enter}
            BEGIN
                 if (c=#8) and (i>0) then Begin
@@ -158,12 +160,16 @@ BEGIN
           TextBackGround (0);
           TextColor (6);
      seek(aciu,0);
-     Writeln('Ciudades ordenadas');
-     writeln('Codigo  Nombre');
-     while not(eof(aciu))do
+
+      GotoXY(40, 6);Writeln('Ciudades ordenadas');
+
+      GotoXY(70, 6);writeln('Codigo  Nombre');
+
+    while not(eof(aciu))do
      BEGIN
           read(aciu,ciu);
-          writeln(ciu.cod_ciudad,'     ',ciu.nombre);
+      GotoXY(60, 6); writeln(ciu.cod_ciudad,'     ');
+      GotoXY(90, 6); writeln( ciu.nombre, '       ');
      END;
      Readln();
 END;
@@ -194,14 +200,19 @@ BEGIN
           TextBackGround (0);
           TextColor (6);
      REPEAT
-           Write('Ingrese el codigo de la ciudad o 0 para salir: ');
-           Readln(cod_ciudad);
+
+           GotoXY(40, 5); WRITELN('----------------------------------------------------');
+           GotoXY(40, 6); Write('Ingrese el codigo de la ciudad o 0 para salir: ');
+           GotoXY(40, 7); WRITELN('----------------------------------------------------');
+           GotoXY(90, 6);Readln(cod_ciudad);
      UNTIL (cod_ciudad='0')or(Bus_cod_ciu(cod_ciudad)=0); {valida que el codigo de ciudad sea unico}
      While (cod_ciudad <>'0') do
      BEGIN
           ciu.cod_ciudad:=cod_ciudad;
-          Write('Ingrese el nombre de la ciudad: ');
-          Readln(ciu.nombre);
+          GotoXY(40, 8); WRITELN('----------------------------------------------------');
+          GotoXY(40, 9); Write('Ingrese el nombre de la ciudad: ');
+          GotoXY(40, 10); WRITELN('----------------------------------------------------');
+          GotoXY(72, 9);Readln(ciu.nombre);
           ciu.cant_e:=0;
           ciu.cant_c:=0;
           write(aciu,ciu);
@@ -211,8 +222,10 @@ BEGIN
                TextBackGround (0);
                TextColor (6);
           REPEAT
-                Write('Ingrese el codigo de la ciudad: ');
-                Readln(cod_ciudad);
+                GotoXY(40, 11);WRITELN('----------------------------------------------------');
+                GotoXY(40, 12);Write('Ingrese el codigo de la ciudad: ');
+                GotoXY(40, 13); WRITELN('----------------------------------------------------');
+                GotoXY(70, 12);Readln(cod_ciudad);
           UNTIL (cod_ciudad='0')or(Bus_cod_ciu(cod_ciudad)=0); {valida que el codigo de ciudad sea unico}
      END;
 END;
@@ -260,12 +273,12 @@ BEGIN
           TextBackGround (0);
           TextColor (6);
      seek(ae,0);
-     Writeln('Listado Empresas');
-     Writeln('Codigo Nombre Codigo_Ciudad');
+     GotoXY(30, 5);Writeln('Listado Empresas');
+     GotoXY(90, 5);Writeln('Codigo Nombre Codigo_Ciudad');
      while not(eof(ae))do
      BEGIN
           read(ae,e);
-          writeln(e.cod_emp,'  ',e.nombre,'  ',e.cod_ciudad);
+     GotoXY(70, 6); writeln(e.cod_emp,'  ',e.nombre,'  ',e.cod_ciudad);
      END;
      Readln();
 END;
@@ -307,36 +320,44 @@ BEGIN
           TextBackGround (0);
           TextColor (6);
      repeat
-           Writeln('Ingrese el codigo de la empresa o 0 para salir: ');
-           Readln(aux);
+
+          GotoXY(40, 5); WRITELN('----------------------------------------------------');
+          GotoXY(40, 6); Writeln('Ingrese el codigo de la empresa o 0 para salir: ');
+          GotoXY(40, 7); WRITELN('----------------------------------------------------');
+
+          GotoXY(90, 6); Readln(aux);
      until (aux='0')or (Bus_cod_em(aux)=0);{valida que el codigo de empresa sea unico}
      While (aux<>'0')DO
            BEGIN
                 e.cod_emp:=aux;
-                GotoXY(50, 8); WRITELN('--------------------------------');
-                GotoXY(50, 9);Writeln('Ingrese el nombre de la empresa: ');
-                GotoXY(50, 10); WRITELN('--------------------------------');
-                Readln(e.nombre);
-                GotoXY(50, 12); WRITELN('--------------------------------');
-                GotoXY(50, 13);Writeln('Ingrese direccion de la empresa: ');
-                GotoXY(50, 14); WRITELN('--------------------------------');
-                Readln(e.direccion);
-                GotoXY(50, 16); WRITELN('--------------------------------');
-                GotoXY(50, 17);Writeln('Ingrese el mail de la empresa: ');   //falta validar
-                GotoXY(50, 18); WRITELN('--------------------------------');
-                Repeat
-                      Readln(mail);
+                GotoXY(40, 8); WRITELN('----------------------------------------------------');
+                GotoXY(40, 9);Writeln('Ingrese el nombre de la empresa: ');
+                GotoXY(40, 10); WRITELN('----------------------------------------------------');
+                GotoXY(75, 9);Readln(e.nombre);
+
+                GotoXY(40, 12); WRITELN('----------------------------------------------------');
+                GotoXY(40, 13);Writeln('Ingrese direccion de la empresa: ');
+                GotoXY(40, 14); WRITELN('----------------------------------------------------');
+                GotoXY(75, 13);Readln(e.direccion);
+
+                GotoXY(40, 16); WRITELN('----------------------------------------------------');
+                GotoXY(40, 17);Writeln('Ingrese el mail de la empresa: ');   //falta validar
+                GotoXY(40, 18); WRITELN('----------------------------------------------------');
+                repeat
+                GotoXY(75, 17);Readln(mail);
                       If (existeme(mail)=true)
                                              Then Writeln('Ingrese un mail no registrado');
                 Until (existeme(mail)=false);
                 e.mail:=mail;
-                GotoXY(50, 20); WRITELN('--------------------------------');
-                GotoXY(50, 21);Writeln('Ingrese el telefono de la empresa: ');
-                GotoXY(50, 22); WRITELN('--------------------------------');
-                Readln(e.telefono);
+                GotoXY(40, 20); WRITELN('----------------------------------------------------');
+                GotoXY(40, 21);Writeln('Ingrese el telefono de la empresa: ');
+                GotoXY(40, 22); WRITELN('----------------------------------------------------');
+                GotoXY(75, 21);Readln(e.telefono);
                 repeat
-                      Writeln('Ingrese el codigo de la ciudad: ');
-                      Readln(aux);
+                      GotoXY(40, 23); WRITELN('----------------------------------------------------');
+                      GotoXY(40, 24); Writeln('Ingrese el codigo de la ciudad: ');
+                      GotoXY(40, 25); WRITELN('----------------------------------------------------');
+                      GotoXY(75, 24);Readln(aux);
                 until Bus_cod_ciu(aux)<>0; {valida que el codigo se ciudad sea uno existente}
                 e.cod_ciudad:=aux;
                 e.cant:=0;
@@ -350,8 +371,10 @@ BEGIN
                 Mostrar_empresas();{funcion auxiliar para mostrar las empresa}
                 ClrScr;
                 repeat
-                      Writeln('Ingrese el codigo de la empresa o 0 para salir: ');
-                      Readln(aux);
+                   GotoXY(40, 23); WRITELN('----------------------------------------------------');
+                   GotoXY(40, 24);   Writeln('Ingrese el codigo de la empresa o 0 para salir: ');
+                   GotoXY(40, 25); WRITELN('----------------------------------------------------');
+                   GotoXY(750, 24);   Readln(aux);
                 until (aux='0')or (Bus_cod_em(aux)=0);{valida que el codigo de empresa sea unico}
            END;
 END;
@@ -404,47 +427,47 @@ BEGIN
           TextColor (6);
      seek(apy,filesize(apy));
      repeat
-           GotoXY(55, 7);WRITELN('Ingrese codigo de proyecto o 0 para salir');
+           GotoXY(50, 7);WRITELN('Ingrese codigo de proyecto o 0 para salir');
            READLN(aux);
      until (aux='0') or (Bus_cod_proy(aux)=0); {valida que el codigo de proyecto sea }
      while (aux<>'0')  do
            begin
            py.cod_proy:=aux;
            repeat
-                GotoXY(50, 9); WRITELN('--------------------------------');
+                GotoXY(50, 9); WRITELN('-------------------------------------------');
                 GotoXY(50, 10); WRITELN('Ingrese el codigo de la empresa');
-                GotoXY(50, 11); WRITELN('--------------------------------');
-                 READLN(aux);
+                GotoXY(50, 11); WRITELN('-------------------------------------------');
+                GotoXY(85, 10); READLN(aux);
            until Bus_cod_em(aux)<>0; {valida que el codigo de empresa exista}
            py.cod_emp:=aux;
            repeat
-                 GotoXY(50, 9); WRITELN('--------------------------------');
-                 GotoXY(50, 10);WRITELN('Ingrese la etapa del proyecto');
-                 GotoXY(50, 11); WRITELN('--------------------------------');
-                 READLN(i);
+                 GotoXY(50, 12); WRITELN('-------------------------------------------');
+                 GotoXY(50, 13);WRITELN('Ingrese la etapa del proyecto');
+                 GotoXY(50, 14); WRITELN('-------------------------------------------');
+                 GotoXY(85, 13);READLN(i);
                  i:=Upcase(i);
            until (i='P') or (i='O') or (i='T');{valida la etapa}
            py.etapa:= i;
            repeat
-                 GotoXY(50, 9); WRITELN('--------------------------------');
-                 GotoXY(50, 10);WRITELN('Ingrese el tipo de proyecto');
-                 GotoXY(50, 11); WRITELN('--------------------------------');
-                 READLN(i);
+                 GotoXY(50, 15); WRITELN('-------------------------------------------');
+                 GotoXY(50, 16);WRITELN('Ingrese el tipo de proyecto');
+                 GotoXY(50, 17); WRITELN('-------------------------------------------');
+                 GotoXY(85, 16);READLN(i);
                  i:=Upcase(i);
            until (i='C') or (i='D') or (i='O') or (i='L');{valida el tipo}
            py.tipo := i;
             repeat
-                 GotoXY(50, 9); WRITELN('--------------------------------');
-                 GotoXY(50, 10); WRITELN('Ingrese el codigo de la ciudad');
-                 GotoXY(50, 11); WRITELN('--------------------------------');
-                 READLN(aux);
+                 GotoXY(50, 18); WRITELN('-------------------------------------------');
+                 GotoXY(50, 19); WRITELN('Ingrese el codigo de la ciudad');
+                 GotoXY(50, 20); WRITELN('-------------------------------------------');
+                 GotoXY(85, 19);READLN(aux);
            until Bus_cod_ciu(aux)<>0; {valida que el codigo de ciudad exista}
            py.cod_ciudad:=aux;
            repeat
-                 GotoXY(50, 9); WRITELN('--------------------------------');
-                 GotoXY(50, 10);WRITELN('Ingrese la cantidad de productos del proyecto');
-                 GotoXY(50, 11); WRITELN('--------------------------------');
-                 READLN(cantidades);
+                 GotoXY(50, 21); WRITELN('-------------------------------------------');
+                 GotoXY(50, 22);WRITELN('Ingrese la cantidad de productos del proyecto');
+                 GotoXY(50, 23); WRITELN('-------------------------------------------');
+                 GotoXY(90, 22);READLN(cantidades);
                  val(cantidades,py.cant[1],error);
            until error=0;
            py.cant[2]:=0;
@@ -613,8 +636,21 @@ BEGIN
                  ClrScr;
                  TextBackGround (0);
                  TextColor (6);
-                 Writeln('Menu empresas desarrolladoras'#13#10'Ingrese su opcion: '#13#10'1- Alta ciudades'#13#10'2- Alta empresas '#13#10'3- Alta proyectos'#13#10'4- Alta productos'#13#10'5- Estadisticas '#13#10'0- volver menu principal');
-                 Readln(opcion);
+                 GotoXY(50, 4);Writeln('MENU EMPRESAS DESARROLLADORAS');
+                 GotoXY(50, 6);WRITELN('--------------------------------');
+                 GotoXY(50, 7);Writeln('1- Alta ciudades');
+                 GotoXY(50, 8);WRITELN('--------------------------------');
+                 GotoXY(50, 9);Writeln('2- Alta empresas ');
+                 GotoXY(50, 10);WRITELN('--------------------------------');
+                 GotoXY(50, 11);Writeln('3- Alta proyectos');
+                 GotoXY(50, 12); WRITELN('--------------------------------');
+                 GotoXY(50, 13);Writeln('4- Alta productos');
+                 GotoXY(50, 14);WRITELN('--------------------------------');
+                 GotoXY(50, 15);Writeln('5- Estadisticas ');
+                 GotoXY(50, 16);WRITELN('--------------------------------');
+                 GotoXY(50, 17);Writeln('0- volver menu principal');
+                 GotoXY(50, 18);WRITELN('--------------------------------');
+                 GotoXY(50, 19);Readln(opcion);
            UNTIL(opcion>='0')AND(opcion<='5'); {valido opcion}
            CASE opcion OF
                 '1': Alta_ciudades();
@@ -807,7 +843,7 @@ Begin
                 ClrScr;
                 TextBackGround (0);
                 TextColor (6);
-                GotoXY(55, 5); Writeln('Bienbenido ',cli.nombre,'  !!');
+                GotoXY(55, 5); Writeln('Bienvenido ',cli.nombre,'  !!');
                 GotoXY(55,6); Writeln('Ingrese su opcion');
                 GotoXY(50, 7); Writeln('------------------------');
                 GotoXY(50,8); Writeln('a. Consulta de Proyecto');
@@ -815,7 +851,8 @@ Begin
                 GotoXY(50,10); Writeln('b. Comprar Producto');
                 GotoXY(50,11); Writeln('------------------------');
                 GotoXY(50,12); Writeln('0. Volver al alta de clientes');
-                GotoXY(50,13);Readln(opcion);
+                GotoXY(50,13); Writeln('------------------------');
+                GotoXY(50,14);Readln(opcion);
                 opcion:=Upcase(opcion);
                 UNTIL (opcion = '0')OR(opcion >= 'A')OR(opcion <= 'B');
         CASE opcion OF
@@ -835,10 +872,13 @@ error:=error;
      TextColor (6);
 
     Repeat
-          writeln('Ingrese su DNI o "0" para salir:');// ingreso DNI y valido que sea numerico
-          readln(doc);
+          GotoXY(50,5);writeln('Ingrese su DNI o "0" para salir:');// ingreso DNI y valido que sea numerico
+          GotoXY(50,7); Writeln('------------------------');
+          GotoXY(50,8);readln(doc);
+          GotoXY(50,9); Writeln('------------------------');
           If not(validarnumero(doc))
                                     Then Writeln('hay un error en la posicion ',error, ' de la cadena numerica');
+                                    Delline
     Until (validarnumero(doc));
 
     While (doc<>'0') do
@@ -847,11 +887,14 @@ error:=error;
                   else
                   begin
                        cli.dni:= doc;
-                       Writeln('Ingrese nombre y apellido: ');
-                       Readln(cli.nombre);
-                       Writeln('Ingrese mail: ');
+                       GotoXY(50,10);Writeln('Ingrese nombre y apellido: ');
+                       GotoXY(50,11); Writeln('------------------------');
+                       GotoXY(50,12);Readln(cli.nombre);
+                       GotoXY(50,13); Writeln('------------------------');
+                       GotoXY(50,14);Writeln('Ingrese mail: ');
                        Repeat
-                             Readln(mail);
+                             GotoXY(50,15);Readln(mail);
+                             GotoXY(50,16); Writeln('------------------------');
                              If (existemc(mail)=true)
                                                    Then Writeln('Ingrese un mail no registrado');
                        Until (existemc(mail)=false);
@@ -884,6 +927,7 @@ BEGIN
  			   GotoXY(50, 7); Writeln('1. Alta de cliente');
                GotoXY(50, 8); Write('------------------------');
                GotoXY(50, 9); Writeln('0. Volver al menu principal');
+               GotoXY(50, 10); Write('------------------------');
                 Readln(opcion);
                 UNTIL (opcion >= '0')OR(opcion <= '1');
         CASE opcion OF
@@ -938,6 +982,7 @@ BEGIN {Programa principal}
                                            BEGIN
                                                  TextColor (12);
                                                  writeln('Clave incorrecta');
+
                                                  readln();
                                                  TextColor (6);
                                            END;
